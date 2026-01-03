@@ -87,7 +87,13 @@ class Book24Spider(Spider):
             dim_split.extend([None, None, None])  # type: ignore
             item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
 
-        # item["books_name"] = response.xpath("//h1/text()[1]").get()
+        books_name = response.css(
+            "div.breadcrumbs.product-detail-page__breadcrumbs > ol > li.breadcrumbs__item._last-item > span::text"
+        ).get()
+        if books_name:
+            item["books_name"] = books_name.strip()
+        else:
+            item["books_name"] = None
 
         # item["authors_name"] = characteristics.css(
         #     'div._name_mmfyx_9:contains("Автор") + div a::text'
