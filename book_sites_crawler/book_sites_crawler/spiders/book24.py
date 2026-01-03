@@ -114,10 +114,8 @@ class Book24Spider(Spider):
             current_price = current_price.replace("\xa0", "").replace("₽", "").strip()
         item["publication_site_price"] = current_price
 
-        # # Language
-        # item["lang"] = characteristics.css(
-        #     'div._feature_mmfyx_1 div._name_mmfyx_9:contains("Язык") ~ div.text-black span::text'
-        # ).get()
+        # # Language # TODO: на сайте не указывается язык
+        item["lang"] = "Русский"
 
         # # Annotation
         # full_text = response.xpath(
