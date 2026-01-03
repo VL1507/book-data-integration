@@ -75,17 +75,17 @@ class Book24Spider(Spider):
             .strip()
         )
 
-        # dim = characteristics.css(
-        #     'div._feature_mmfyx_1 div._name_mmfyx_9:contains("Размеры") ~ div.text-black span::text'
-        # ).get()
-        # if dim is None:
-        #     item["dim_x"] = None
-        #     item["dim_y"] = None
-        #     item["dim_z"] = None
-        # else:
-        #     dim_split = dim.split("x")
-        #     dim_split.extend([None, None, None])  # type: ignore
-        #     item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
+        dim = characteristics.xpath(
+            './/span[contains(., " Формат: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+        ).get()
+        if dim is None:
+            item["dim_x"] = None
+            item["dim_y"] = None
+            item["dim_z"] = None
+        else:
+            dim_split = dim.strip().split()[0].split("x")
+            dim_split.extend([None, None, None])  # type: ignore
+            item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
 
         # item["books_name"] = response.xpath("//h1/text()[1]").get()
 
