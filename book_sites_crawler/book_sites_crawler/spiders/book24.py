@@ -51,9 +51,7 @@ class Book24Spider(Spider):
             map(
                 lambda isbn: isbn.replace("-", ""),
                 (
-                    characteristics.css(
-                        'button.isbn-product::text'
-                    )
+                    characteristics.css("button.isbn-product::text")
                     .get(default="")
                     .strip()
                     .split(", ")
@@ -61,9 +59,13 @@ class Book24Spider(Spider):
             )
         )
 
-        # item["year"] = characteristics.css(
-        #     'div._name_mmfyx_9:contains("Издательство") + div span:last-child::text'
-        # ).get()
+        item["year"] = (
+            characteristics.xpath(
+                './/span[contains(., "Год издания")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+            )
+            .get(default="")
+            .strip()
+        )
 
         # item["page_count"] = characteristics.css(
         #     'div._feature_mmfyx_1 div._name_mmfyx_9:contains("Страниц") ~ div.text-black span::text'
