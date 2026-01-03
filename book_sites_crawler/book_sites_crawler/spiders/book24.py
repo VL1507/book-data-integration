@@ -106,13 +106,13 @@ class Book24Spider(Spider):
         item["sites_site"] = "book24"
         item["sites_url"] = self.allowed_domains[0]
 
-        # # PublicationSite
-        # current_price = response.xpath(
-        #     './/*[@id="__nuxt"]/main/article/div[5]/section[5]/div/div[1]/div/div[1]/text()'
-        # ).get()
-        # if current_price:
-        #     current_price = current_price.replace("\xa0", "").strip()
-        # item["publication_site_price"] = current_price
+        # PublicationSite
+        current_price = response.css(
+            "span.app-price.product-sidebar-price__price::text"
+        ).get()
+        if current_price:
+            current_price = current_price.replace("\xa0", "").replace("₽", "").strip()
+        item["publication_site_price"] = current_price
 
         # # Language
         # item["lang"] = characteristics.css(
