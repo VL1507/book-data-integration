@@ -45,18 +45,21 @@ class Book24Spider(Spider):
     ) -> Generator[BookSitesCrawlerItem, Any, None]:
         item = BookSitesCrawlerItem()
 
-        # item["isbn"] = list(
-        #     map(
-        #         lambda isbn: isbn.replace("-", ""),
-        #         (
-        #             characteristics.css(
-        #                 'div._feature_mmfyx_1 div._name_mmfyx_9:contains("ISBN") ~ div.text-black span::text'
-        #             )
-        #             .get(default="")
-        #             .split(", ")
-        #         ),
-        #     )
-        # )
+        characteristics = response.css("#product-characteristic > dl")
+
+        item["isbn"] = list(
+            map(
+                lambda isbn: isbn.replace("-", ""),
+                (
+                    characteristics.css(
+                        'button.isbn-product::text'
+                    )
+                    .get(default="")
+                    .strip()
+                    .split(", ")
+                ),
+            )
+        )
 
         # item["year"] = characteristics.css(
         #     'div._name_mmfyx_9:contains("Издательство") + div span:last-child::text'
