@@ -1,6 +1,6 @@
 from typing import Any, Generator
 
-from scrapy import Request, Spider
+from scrapy import Spider
 from scrapy.http import Response
 
 from book_sites_crawler.items import BookSitesCrawlerItem
