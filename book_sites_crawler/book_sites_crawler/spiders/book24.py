@@ -95,13 +95,13 @@ class Book24Spider(Spider):
         else:
             item["books_name"] = None
 
-        # item["authors_name"] = characteristics.css(
-        #     'div._name_mmfyx_9:contains("Автор") + div a::text'
-        # ).getall()
+        item["authors_name"] = characteristics.xpath(
+            './/span[contains(., " Автор: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
+        ).getall()
 
-        # item["genre"] = response.css(
-        #     'div#сharacteristics div._name_mmfyx_9:contains("Жанр") + div a::text'
-        # ).getall()
+        item["genre"] = characteristics.xpath(
+            './/span[contains(., " Раздел: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
+        ).getall()
 
         # item["sites_site"] = "labirint"
         # item["sites_url"] = self.allowed_domains[0]
