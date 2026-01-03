@@ -118,18 +118,22 @@ class Book24Spider(Spider):
         item["lang"] = "Русский"
 
         # # Annotation
-        # full_text = response.xpath(
-        #     '//*[@id="annotation"]/div[2]/div/div[1]/div[1]//text()'
-        # ).getall()
-        # item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
+        full_text = response.css(
+            "div#product-about div.product-about__additional p::text"
+        ).getall()
+        item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
 
-        # item["publishing_houses_name"] = characteristics.css(
-        #     'div._name_mmfyx_9:contains("Издательство") + div a::text'
-        # ).get()
-        # # TODO: сейчас ссылка на лабиринт а не на само издательство
-        # item["publishing_houses_url"] = characteristics.css(
-        #     'div._name_mmfyx_9:contains("Издательство") + div a::attr(href)'
-        # ).get()
+        item["publishing_houses_name"] = characteristics.xpath(
+            './/span[contains(., " Издательство: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
+        ).get()
+
+        publishing_houses_url = characteristics.xpath(
+            './/span[contains(., " Издательство: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/@href'
+        ).get()
+        if publishing_houses_url:
+            item["publishing_houses_url"] = "https://book24.ru" + publishing_houses_url
+        else:
+            item["publishing_houses_url"] = None
 
         # # Recension
         # # item["recension_link"] = ...
