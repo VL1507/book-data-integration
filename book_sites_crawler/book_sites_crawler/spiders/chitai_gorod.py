@@ -15,8 +15,8 @@ class ChitaiGorodSpider(Spider):
         book_links = response.css("a.product-card__title::attr(href)").getall()
         print(f"{len(book_links)=}")
 
-        # for book_link in book_links:
-        #     yield response.follow(book_link, callback=self.parse_book_detail)
+        for book_link in book_links:
+            yield response.follow(book_link, callback=self.parse_book_detail)
 
         # next_page = response.css("div.app-catalog__pagination a::attr(href)").get()
         # if next_page:

@@ -16,34 +16,41 @@ class LabirintSpider(Spider):
         "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
         "CONCURRENT_REQUESTS": 16,
         "CONCURRENT_REQUESTS_PER_DOMAIN": 8,
-        # "DOWNLOAD_DELAY": 0.5,
-        # "RANDOMIZE_DOWNLOAD_DELAY": True,
-        # "DOWNLOAD_TIMEOUT": 30,
+        #
+        "DOWNLOAD_DELAY": 0.5,
+        "RANDOMIZE_DOWNLOAD_DELAY": True,
+        "DOWNLOAD_TIMEOUT": 30,
+        #
         "HTTPCACHE_ENABLED": True,
-        # "ITEM_PIPELINES": {
-        #     # 'book_parsers.pipelines.BookImagesPipeline=100,
-        #     "scrapy.pipelines.images.ImagesPipeline": 1
-        # },
-        # "IMAGES_STORE": "data/images/labirint/1",
-        # "IMAGES_URLS_FIELD": "image_urls",
-        # "IMAGES_RESULT_FIELD": "images",
+        #
+        "LOG_LEVEL": "INFO",
     }
+    page_count_limit = 40
+    page_count = 0
 
     def parse(self, response: Response, **kwargs: Any) -> Any:
         book_links = response.css("a.cover.genres-cover::attr(href)").getall()
-        print(f"{len(book_links)=}")
+
+        self.logger.info(
+            f"\n\n{len(book_links)=}\n{self.page_count}/{self.page_count_limit}\n"
+        )
 
         for book_link in book_links:
             if book_link and "/books/" in book_link:
                 yield response.follow(book_link, callback=self.parse_book_detail)
 
-        # next_page = response.css("a.pagination-next__text::attr(href)").get()
-        # if next_page:
-        #     yield response.follow(next_page, self.parse)
+        next_page = response.css("a.pagination-next__text::attr(href)").get()
+        if next_page:
+            if self.page_count >= self.page_count_limit:
+                return
+            self.page_count += 1
+            yield response.follow(next_page, self.parse)
 
     def parse_book_detail(
         self, response: Response
     ) -> Generator[BookSitesCrawlerItem, Any, None]:
+        self.logger.info(response.url)
+
         characteristics = response.css("div#сharacteristics")
 
         item = BookSitesCrawlerItem()
