@@ -103,8 +103,8 @@ class Book24Spider(Spider):
             './/span[contains(., " Раздел: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
         ).getall()
 
-        # item["sites_site"] = "labirint"
-        # item["sites_url"] = self.allowed_domains[0]
+        item["sites_site"] = "book24"
+        item["sites_url"] = self.allowed_domains[0]
 
         # # PublicationSite
         # current_price = response.xpath(
