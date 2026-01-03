@@ -144,9 +144,13 @@ class Book24Spider(Spider):
         # ).get()
 
         # # CoveragesTypes
-        # item["coverages_types_name"] = characteristics.css(
-        #     'div._name_mmfyx_9:contains("Тип обложки") ~ div.text-black span::text'
-        # ).get()
+        coverages_types_name = characteristics.xpath(
+            './/span[contains(., " Переплет: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+        ).get()
+        if coverages_types_name:
+            item["coverages_types_name"] = coverages_types_name.strip()
+        else:
+            item["coverages_types_name"] = None
 
         # # AdditionalCharacteristics # TODO: что это и зачем
         # # item["additional_characteristics_name"] = ...
