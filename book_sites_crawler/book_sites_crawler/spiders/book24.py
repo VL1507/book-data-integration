@@ -67,9 +67,13 @@ class Book24Spider(Spider):
             .strip()
         )
 
-        # item["page_count"] = characteristics.css(
-        #     'div._feature_mmfyx_1 div._name_mmfyx_9:contains("Страниц") ~ div.text-black span::text'
-        # ).get()
+        item["page_count"] = (
+            characteristics.xpath(
+                './/span[contains(., " Количество страниц: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+            )
+            .get(default="")
+            .strip()
+        )
 
         # dim = characteristics.css(
         #     'div._feature_mmfyx_1 div._name_mmfyx_9:contains("Размеры") ~ div.text-black span::text'
