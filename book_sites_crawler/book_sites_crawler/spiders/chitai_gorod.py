@@ -96,9 +96,12 @@ class ChitaiGorodSpider(Spider):
 
         item["books_name"] = response.css("h1.product-detail-page__title::text").get()
 
-        # item["authors_name"] = characteristics.xpath(
-        #     './/span[contains(., " Автор: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
-        # ).getall()
+        item["authors_name"] = list(
+            map(
+                lambda author_name: author_name.replace(",", "").strip(),
+                response.css("ul.product-authors a::text").getall(),
+            )
+        )
 
         # item["genre"] = characteristics.xpath(
         #     './/span[contains(., " Раздел: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
