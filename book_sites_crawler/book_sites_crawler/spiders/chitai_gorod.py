@@ -51,8 +51,7 @@ class ChitaiGorodSpider(Spider):
         self.logger.info(response.url)
 
         item = BookSitesCrawlerItem()
-        
-        
+
         # characteristics = response.css("#product-characteristic > dl")
 
         # item["isbn"] = list(
@@ -166,15 +165,10 @@ class ChitaiGorodSpider(Spider):
         # # # item["characteristics_to_additional_value"] = ...
         # # # item["additional_characteristics"] = ...
 
-        # image_url = response.xpath(
-        #     '//div[@class="product-poster__main-slide"][1]//source/@srcset'
-        # ).get()
-        # if image_url:
-        #     item["image_urls"] = "https:" + image_url.split()[0].strip()
-        # else:
-        #     item["image_urls"] = None
+        item["image_urls"] = response.css(
+            'meta[property="og:image"]::attr(content)'
+        ).get()
 
         item["url"] = response.url
-        
 
         yield item
