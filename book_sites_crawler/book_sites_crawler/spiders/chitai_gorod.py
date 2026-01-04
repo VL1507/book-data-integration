@@ -60,7 +60,7 @@ class ChitaiGorodSpider(Spider):
                 characteristics.css('span[itemprop="isbn"] span::text').getall(),
             )
         )
-        
+
         if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
             return
 
