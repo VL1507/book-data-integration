@@ -101,8 +101,8 @@ class ChitaiGorodSpider(Spider):
             current_price = current_price.replace("\xa0", "").replace("₽", "").strip()
         item["publication_site_price"] = current_price
 
-        # # # Language # TODO: на сайте не указывается язык
-        # item["lang"] = "Русский"
+        # Language # TODO: на сайте не указывается язык
+        item["lang"] = "Русский"
 
         # # # Annotation
         # full_text = response.css(
