@@ -23,7 +23,7 @@ class ChitaiGorodSpider(Spider):
         #
         "HTTPCACHE_ENABLED": True,
         #
-        # "LOG_LEVEL": "INFO",
+        "LOG_LEVEL": "INFO",
     }
     page_count_limit = 20
     page_count = 0
@@ -38,12 +38,12 @@ class ChitaiGorodSpider(Spider):
         for book_link in book_links:
             yield response.follow(book_link, callback=self.parse_book_detail)
 
-        # next_page = response.css("div.app-catalog__pagination a::attr(href)").get()
-        # if next_page:
-        #     if self.page_count >= self.page_count_limit:
-        #         return
-        #     self.page_count += 1
-        #     yield response.follow(next_page, self.parse)
+        next_page = response.css("div.app-catalog__pagination a::attr(href)").get()
+        if next_page:
+            if self.page_count >= self.page_count_limit:
+                return
+            self.page_count += 1
+            yield response.follow(next_page, self.parse)
 
     def parse_book_detail(
         self, response: Response
