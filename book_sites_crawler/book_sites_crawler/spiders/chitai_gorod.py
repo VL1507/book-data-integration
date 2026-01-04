@@ -105,10 +105,10 @@ class ChitaiGorodSpider(Spider):
         item["lang"] = "Русский"
 
         # Annotation
-        # full_text = response.css(
-        #     "div#product-about div.product-about__additional p::text"
-        # ).getall()
-        # item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
+        full_text = characteristics.css(
+            "article.product-detail-page__detail-text::text"
+        ).getall()
+        item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
 
         item["publishing_houses_name"] = characteristics.css(
             'span[itemprop="publisher"] a::text'
