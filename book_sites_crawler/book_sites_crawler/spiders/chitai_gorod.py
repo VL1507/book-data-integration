@@ -52,19 +52,14 @@ class ChitaiGorodSpider(Spider):
 
         item = BookSitesCrawlerItem()
 
-        # characteristics = response.css("#product-characteristic > dl")
+        characteristics = response.css("div#description")
 
-        # item["isbn"] = list(
-        #     map(
-        #         lambda isbn: isbn.replace("-", ""),
-        #         (
-        #             characteristics.css("button.isbn-product::text")
-        #             .get(default="")
-        #             .strip()
-        #             .split(", ")
-        #         ),
-        #     )
-        # )
+        item["isbn"] = list(
+            map(
+                lambda isbn: isbn.replace("-", "").strip(),
+                characteristics.css('span[itemprop="isbn"] span::text').getall(),
+            )
+        )
 
         # item["year"] = (
         #     characteristics.xpath(
