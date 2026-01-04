@@ -65,17 +65,15 @@ class ChitaiGorodSpider(Spider):
 
         item["page_count"] = characteristics.css('span[itemprop="numberOfPages"] span::text').get()
 
-        # dim = characteristics.xpath(
-        #     './/span[contains(., " Формат: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
-        # ).get()
-        # if dim is None:
-        #     item["dim_x"] = None
-        #     item["dim_y"] = None
-        #     item["dim_z"] = None
-        # else:
-        #     dim_split = dim.strip().split()[0].split("x")
-        #     dim_split.extend([None, None, None])  # type: ignore
-        #     item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
+        dim = characteristics.css('span[itemprop="size"] span::text').get()
+        if dim is None:
+            item["dim_x"] = None
+            item["dim_y"] = None
+            item["dim_z"] = None
+        else:
+            dim_split = dim.strip().split()[0].split("x")
+            dim_split.extend([None, None, None])  # type: ignore
+            item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
 
         item["books_name"] = response.css("h1.product-detail-page__title::text").get()
 
