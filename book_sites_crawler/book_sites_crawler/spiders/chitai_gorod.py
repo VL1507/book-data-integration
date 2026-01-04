@@ -174,7 +174,7 @@ class ChitaiGorodSpider(Spider):
         # else:
         #     item["image_urls"] = None
 
-        # item["url"] = response.url
+        item["url"] = response.url
         
 
         yield item
