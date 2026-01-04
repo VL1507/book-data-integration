@@ -25,7 +25,7 @@ class ChitaiGorodSpider(Spider):
         #
         # "LOG_LEVEL": "INFO",
     }
-    page_count_limit = 40
+    page_count_limit = 20
     page_count = 0
 
     def parse(self, response: Response, **kwargs: Any) -> Any:
@@ -63,13 +63,7 @@ class ChitaiGorodSpider(Spider):
 
         item["year"] = characteristics.css('span[itemprop="datePublished"] span::text').get()
 
-        # item["page_count"] = (
-        #     characteristics.xpath(
-        #         './/span[contains(., " Количество страниц: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
-        #     )
-        #     .get(default="")
-        #     .strip()
-        # )
+        item["page_count"] = characteristics.css('span[itemprop="numberOfPages"] span::text').get()
 
         # dim = characteristics.xpath(
         #     './/span[contains(., " Формат: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
