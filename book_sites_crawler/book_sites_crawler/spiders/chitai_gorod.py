@@ -25,21 +25,31 @@ class ChitaiGorodSpider(Spider):
         #
         # "LOG_LEVEL": "INFO",
     }
+    page_count_limit = 40
+    page_count = 0
 
     def parse(self, response: Response, **kwargs: Any) -> Any:
         book_links = response.css("a.product-card__title::attr(href)").getall()
-        print(f"{len(book_links)=}")
+
+        self.logger.info(
+            f"\n\n{len(book_links)=}\n{self.page_count}/{self.page_count_limit}\n"
+        )
 
         for book_link in book_links:
             yield response.follow(book_link, callback=self.parse_book_detail)
 
         # next_page = response.css("div.app-catalog__pagination a::attr(href)").get()
         # if next_page:
+        #     if self.page_count >= self.page_count_limit:
+        #         return
+        #     self.page_count += 1
         #     yield response.follow(next_page, self.parse)
 
     def parse_book_detail(
         self, response: Response
     ) -> Generator[BookSitesCrawlerItem, Any, None]:
+        self.logger.info(response.url)
+
         item = BookSitesCrawlerItem()
 
         yield item
