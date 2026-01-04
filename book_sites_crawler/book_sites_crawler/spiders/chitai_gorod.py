@@ -51,5 +51,130 @@ class ChitaiGorodSpider(Spider):
         self.logger.info(response.url)
 
         item = BookSitesCrawlerItem()
+        
+        
+        # characteristics = response.css("#product-characteristic > dl")
+
+        # item["isbn"] = list(
+        #     map(
+        #         lambda isbn: isbn.replace("-", ""),
+        #         (
+        #             characteristics.css("button.isbn-product::text")
+        #             .get(default="")
+        #             .strip()
+        #             .split(", ")
+        #         ),
+        #     )
+        # )
+
+        # item["year"] = (
+        #     characteristics.xpath(
+        #         './/span[contains(., "Год издания")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+        #     )
+        #     .get(default="")
+        #     .strip()
+        # )
+
+        # item["page_count"] = (
+        #     characteristics.xpath(
+        #         './/span[contains(., " Количество страниц: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+        #     )
+        #     .get(default="")
+        #     .strip()
+        # )
+
+        # dim = characteristics.xpath(
+        #     './/span[contains(., " Формат: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+        # ).get()
+        # if dim is None:
+        #     item["dim_x"] = None
+        #     item["dim_y"] = None
+        #     item["dim_z"] = None
+        # else:
+        #     dim_split = dim.strip().split()[0].split("x")
+        #     dim_split.extend([None, None, None])  # type: ignore
+        #     item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
+
+        # books_name = response.css(
+        #     "div.breadcrumbs.product-detail-page__breadcrumbs > ol > li.breadcrumbs__item._last-item > span::text"
+        # ).get()
+        # if books_name:
+        #     item["books_name"] = books_name.strip()
+        # else:
+        #     item["books_name"] = None
+
+        # item["authors_name"] = characteristics.xpath(
+        #     './/span[contains(., " Автор: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
+        # ).getall()
+
+        # item["genre"] = characteristics.xpath(
+        #     './/span[contains(., " Раздел: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
+        # ).getall()
+
+        item["sites_site"] = "chitai-gorod"
+        item["sites_url"] = self.allowed_domains[0]
+
+        # # PublicationSite
+        # current_price = response.css(
+        #     "span.app-price.product-sidebar-price__price::text"
+        # ).get()
+        # if current_price:
+        #     current_price = current_price.replace("\xa0", "").replace("₽", "").strip()
+        # item["publication_site_price"] = current_price
+
+        # # # Language # TODO: на сайте не указывается язык
+        # item["lang"] = "Русский"
+
+        # # # Annotation
+        # full_text = response.css(
+        #     "div#product-about div.product-about__additional p::text"
+        # ).getall()
+        # item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
+
+        # item["publishing_houses_name"] = characteristics.xpath(
+        #     './/span[contains(., " Издательство: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
+        # ).get()
+
+        # publishing_houses_url = characteristics.xpath(
+        #     './/span[contains(., " Издательство: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/@href'
+        # ).get()
+        # if publishing_houses_url:
+        #     item["publishing_houses_url"] = "https://book24.ru" + publishing_houses_url
+        # else:
+        #     item["publishing_houses_url"] = None
+
+        # # # Recension
+        # # # item["recension_link"] = ...
+
+        # # # IllustrationTypes
+        # # item["illustration_types_name"] = characteristics.css(
+        # #     'div._name_mmfyx_9:contains("Иллюстрации") ~ div.text-black span::text'
+        # # ).get()
+
+        # # # CoveragesTypes
+        # coverages_types_name = characteristics.xpath(
+        #     './/span[contains(., " Переплет: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+        # ).get()
+        # if coverages_types_name:
+        #     item["coverages_types_name"] = coverages_types_name.strip()
+        # else:
+        #     item["coverages_types_name"] = None
+
+        # # # AdditionalCharacteristics # TODO: что это и зачем
+        # # # item["additional_characteristics_name"] = ...
+        # # # CharacteristicsToAdditional
+        # # # item["characteristics_to_additional_value"] = ...
+        # # # item["additional_characteristics"] = ...
+
+        # image_url = response.xpath(
+        #     '//div[@class="product-poster__main-slide"][1]//source/@srcset'
+        # ).get()
+        # if image_url:
+        #     item["image_urls"] = "https:" + image_url.split()[0].strip()
+        # else:
+        #     item["image_urls"] = None
+
+        # item["url"] = response.url
+        
 
         yield item
