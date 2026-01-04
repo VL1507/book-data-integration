@@ -9,7 +9,7 @@ from book_sites_crawler.items import BookSitesCrawlerItem
 class ChitaiGorodSpider(Spider):
     name = "chitai-gorod"
     allowed_domains = ["chitai-gorod.ru"]
-    start_urls = ["https://chitai-gorod.ru/catalog/books-18030"]
+    start_urls = ["https://www.chitai-gorod.ru/catalog/books-18030"]
 
     custom_settings = {
         "ROBOTSTXT_OBEY": False,

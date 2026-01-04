@@ -9,7 +9,10 @@ from book_sites_crawler.items import BookSitesCrawlerItem
 class LabirintSpider(Spider):
     name = "labirint"
     allowed_domains = ["labirint.ru"]
-    start_urls = ["https://labirint.ru/books/"]
+    start_urls = [
+        # "https://labirint.ru/books/",
+        "https://www.labirint.ru/genres/1852/",
+    ]
 
     custom_settings = {
         "ROBOTSTXT_OBEY": False,

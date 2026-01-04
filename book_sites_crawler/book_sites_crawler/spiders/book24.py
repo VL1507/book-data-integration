@@ -9,10 +9,13 @@ from book_sites_crawler.items import BookSitesCrawlerItem
 class Book24Spider(Spider):
     name = "book24"
     allowed_domains = ["book24.ru"]
-    start_urls = ["https://book24.ru/catalog/"]
+    start_urls = [
+        # "https://book24.ru/catalog/",
+        "https://book24.ru/catalog/fiction-1592/",
+    ]
 
     custom_settings = {
-        # "ROBOTSTXT_OBEY": False,
+        "ROBOTSTXT_OBEY": False,
         "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
         "CONCURRENT_REQUESTS": 16,
         "CONCURRENT_REQUESTS_PER_DOMAIN": 8,
