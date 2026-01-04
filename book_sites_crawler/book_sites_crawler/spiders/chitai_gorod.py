@@ -84,9 +84,7 @@ class ChitaiGorodSpider(Spider):
             )
         )
 
-        # item["genre"] = characteristics.xpath(
-        #     './/span[contains(., " Раздел: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
-        # ).getall()
+        item["genre"] = characteristics.css('span[itemprop="comicGenres"] a::text').getall()
 
         item["sites_site"] = "chitai-gorod"
         item["sites_url"] = self.allowed_domains[0]
