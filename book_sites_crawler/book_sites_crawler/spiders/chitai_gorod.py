@@ -61,13 +61,7 @@ class ChitaiGorodSpider(Spider):
             )
         )
 
-        # item["year"] = (
-        #     characteristics.xpath(
-        #         './/span[contains(., "Год издания")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
-        #     )
-        #     .get(default="")
-        #     .strip()
-        # )
+        item["year"] = characteristics.css('span[itemprop="datePublished"] span::text').get()
 
         # item["page_count"] = (
         #     characteristics.xpath(
