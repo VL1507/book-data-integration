@@ -104,7 +104,7 @@ class ChitaiGorodSpider(Spider):
         # Language # TODO: на сайте не указывается язык
         item["lang"] = "Русский"
 
-        # # # Annotation
+        # Annotation
         # full_text = response.css(
         #     "div#product-about div.product-about__additional p::text"
         # ).getall()
@@ -122,28 +122,26 @@ class ChitaiGorodSpider(Spider):
         else:
             item["publishing_houses_url"] = None
 
-        # # # Recension
-        # # # item["recension_link"] = ...
+        # Recension
+        # item["recension_link"] = ...
 
-        # # # IllustrationTypes
-        # # item["illustration_types_name"] = characteristics.css(
-        # #     'div._name_mmfyx_9:contains("Иллюстрации") ~ div.text-black span::text'
-        # # ).get()
+        # IllustrationTypes # TODO: нет такой характеристики на сайте
+        item["illustration_types_name"] = None
 
-        # # # CoveragesTypes
-        # coverages_types_name = characteristics.xpath(
-        #     './/span[contains(., " Переплет: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
-        # ).get()
-        # if coverages_types_name:
-        #     item["coverages_types_name"] = coverages_types_name.strip()
-        # else:
-        #     item["coverages_types_name"] = None
+        # CoveragesTypes
+        coverages_types_name = characteristics.css(
+            'span[itemprop="bookFormat"] span::text'
+        ).get()
+        if coverages_types_name:
+            item["coverages_types_name"] = coverages_types_name.strip()
+        else:
+            item["coverages_types_name"] = None
 
-        # # # AdditionalCharacteristics # TODO: что это и зачем
-        # # # item["additional_characteristics_name"] = ...
-        # # # CharacteristicsToAdditional
-        # # # item["characteristics_to_additional_value"] = ...
-        # # # item["additional_characteristics"] = ...
+        # AdditionalCharacteristics # TODO: что это и зачем
+        # item["additional_characteristics_name"] = ...
+        # CharacteristicsToAdditional
+        # item["characteristics_to_additional_value"] = ...
+        # item["additional_characteristics"] = ...
 
         item["image_urls"] = response.css(
             'meta[property="og:image"]::attr(content)'
