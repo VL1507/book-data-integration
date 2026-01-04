@@ -70,6 +70,9 @@ class Book24Spider(Spider):
                 ),
             )
         )
+        
+        if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
+            return
 
         item["year"] = (
             characteristics.xpath(

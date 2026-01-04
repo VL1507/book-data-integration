@@ -57,6 +57,7 @@ class LabirintSpider(Spider):
         characteristics = response.css("div#сharacteristics")
 
         item = BookSitesCrawlerItem()
+
         item["isbn"] = list(
             map(
                 lambda isbn: isbn.replace("-", ""),
@@ -69,6 +70,9 @@ class LabirintSpider(Spider):
                 ),
             )
         )
+
+        if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
+            return
 
         item["year"] = characteristics.css(
             'div._name_mmfyx_9:contains("Издательство") + div span:last-child::text'
