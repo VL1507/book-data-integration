@@ -110,17 +110,17 @@ class ChitaiGorodSpider(Spider):
         # ).getall()
         # item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
 
-        # item["publishing_houses_name"] = characteristics.xpath(
-        #     './/span[contains(., " Издательство: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
-        # ).get()
+        item["publishing_houses_name"] = characteristics.css(
+            'span[itemprop="publisher"] a::text'
+        ).get()
 
-        # publishing_houses_url = characteristics.xpath(
-        #     './/span[contains(., " Издательство: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/@href'
-        # ).get()
-        # if publishing_houses_url:
-        #     item["publishing_houses_url"] = "https://book24.ru" + publishing_houses_url
-        # else:
-        #     item["publishing_houses_url"] = None
+        publishing_houses_url = characteristics.css(
+            'span[itemprop="publisher"] a::attr(href)'
+        ).get()
+        if publishing_houses_url:
+            item["publishing_houses_url"] = response.urljoin(publishing_houses_url)
+        else:
+            item["publishing_houses_url"] = None
 
         # # # Recension
         # # # item["recension_link"] = ...
