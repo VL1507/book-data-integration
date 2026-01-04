@@ -61,9 +61,13 @@ class ChitaiGorodSpider(Spider):
             )
         )
 
-        item["year"] = characteristics.css('span[itemprop="datePublished"] span::text').get()
+        item["year"] = characteristics.css(
+            'span[itemprop="datePublished"] span::text'
+        ).get()
 
-        item["page_count"] = characteristics.css('span[itemprop="numberOfPages"] span::text').get()
+        item["page_count"] = characteristics.css(
+            'span[itemprop="numberOfPages"] span::text'
+        ).get()
 
         dim = characteristics.css('span[itemprop="size"] span::text').get()
         if dim is None:
@@ -84,18 +88,18 @@ class ChitaiGorodSpider(Spider):
             )
         )
 
-        item["genre"] = characteristics.css('span[itemprop="comicGenres"] a::text').getall()
+        item["genre"] = characteristics.css(
+            'span[itemprop="comicGenres"] a::text'
+        ).getall()
 
         item["sites_site"] = "chitai-gorod"
         item["sites_url"] = self.allowed_domains[0]
 
-        # # PublicationSite
-        # current_price = response.css(
-        #     "span.app-price.product-sidebar-price__price::text"
-        # ).get()
-        # if current_price:
-        #     current_price = current_price.replace("\xa0", "").replace("₽", "").strip()
-        # item["publication_site_price"] = current_price
+        # PublicationSite
+        current_price = response.css("span.product-offer-price__actual::text").get()
+        if current_price:
+            current_price = current_price.replace("\xa0", "").replace("₽", "").strip()
+        item["publication_site_price"] = current_price
 
         # # # Language # TODO: на сайте не указывается язык
         # item["lang"] = "Русский"
