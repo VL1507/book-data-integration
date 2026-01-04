@@ -94,13 +94,7 @@ class ChitaiGorodSpider(Spider):
         #     dim_split.extend([None, None, None])  # type: ignore
         #     item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
 
-        # books_name = response.css(
-        #     "div.breadcrumbs.product-detail-page__breadcrumbs > ol > li.breadcrumbs__item._last-item > span::text"
-        # ).get()
-        # if books_name:
-        #     item["books_name"] = books_name.strip()
-        # else:
-        #     item["books_name"] = None
+        item["books_name"] = response.css("h1.product-detail-page__title::text").get()
 
         # item["authors_name"] = characteristics.xpath(
         #     './/span[contains(., " Автор: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
