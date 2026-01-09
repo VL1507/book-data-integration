@@ -1,0 +1,17 @@
+DROP TABLE IF EXISTS "Language";
+DROP TABLE IF EXISTS "Books";
+DROP TABLE IF EXISTS "Sites";
+DROP TABLE IF EXISTS "Authors";
+DROP TABLE IF EXISTS "PublishingHouses";
+DROP TABLE IF EXISTS "CoveragesTypes";
+DROP TABLE IF EXISTS "IllustatinonTypes";
+DROP TABLE IF EXISTS "Genre";
+DROP TABLE IF EXISTS "AdditionalCharacteristics";
+DROP TABLE IF EXISTS "Pubication";
+DROP TABLE IF EXISTS "Recenzion";
+DROP TABLE IF EXISTS "PublicationSite";
+DROP TABLE IF EXISTS "PublicationAuthors";
+DROP TABLE IF EXISTS "Annotation";
+DROP TABLE IF EXISTS "Characteristics";
+DROP TABLE IF EXISTS "CharacteristicsAdditional";
+DROP TABLE IF EXISTS "CharacteristicsGenre";
