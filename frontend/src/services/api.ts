@@ -2,7 +2,8 @@ import axios from 'axios'
 import type { Book, BookFilters } from '@/types/book'
 
 // TODO: добавить путь в env
-const API_BASE_URL = 'http://book_backend:8000'
+// const API_BASE_URL = 'http://book_backend:8000'
+const API_BASE_URL = '/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,

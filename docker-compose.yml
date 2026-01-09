@@ -36,13 +36,17 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p221683"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p221683" ]
       timeout: 30s
       retries: 10
       interval: 10s
       start_period: 40s
 
-
 volumes:
   venv_volume:
   mysql_data:
+
+
+networks:
+  default:
+    name: book-network
