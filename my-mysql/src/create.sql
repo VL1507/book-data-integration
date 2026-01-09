@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS CoveragesTypes (
 	name VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS IllustatinonTypes (
+CREATE TABLE IF NOT EXISTS IllustratinonTypes (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL
 );
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS AdditionalCharacteristics (
 	name VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Pubication (
+CREATE TABLE IF NOT EXISTS Publication (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	book_id INTEGER NOT NULL,
 	publisher_id INTEGER NOT NULL,
@@ -53,11 +53,11 @@ CREATE TABLE IF NOT EXISTS Pubication (
 	FOREIGN KEY (book_id) REFERENCES Books(id)
 );
 
-CREATE TABLE IF NOT EXISTS Recenzion (
+CREATE TABLE IF NOT EXISTS Recension (
     id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	publication_id INTEGER NOT NULL,
 	link VARCHAR(255) NOT NULL,
-	FOREIGN KEY (publication_id) REFERENCES Pubication(id)
+	FOREIGN KEY (publication_id) REFERENCES Publication(id)
 );
 
 CREATE TABLE IF NOT EXISTS PublicationSite (
@@ -67,21 +67,21 @@ CREATE TABLE IF NOT EXISTS PublicationSite (
 	price REAL NOT NULL,
 	image_url VARCHAR(255),
 	FOREIGN KEY (site_id) REFERENCES Sites(id),
-	FOREIGN KEY (publication_id) REFERENCES Pubication(id)
+	FOREIGN KEY (publication_id) REFERENCES Publication(id)
 );
 
 CREATE TABLE IF NOT EXISTS PublicationAuthors (
 	publication_id INTEGER NOT NULL,
 	authors_id INTEGER NOT NULL,
 	PRIMARY KEY (publication_id, authors_id),
-	FOREIGN KEY (publication_id) REFERENCES Pubication(id),
+	FOREIGN KEY (publication_id) REFERENCES Publication(id),
 	FOREIGN KEY (authors_id) REFERENCES Authors(id)
 );
 
 CREATE TABLE IF NOT EXISTS Annotation (
 	publication_site_id INTEGER NOT NULL,
 	lang_id INTEGER NOT NULL,
-	desctiption TEXT NOT NULL,
+	description TEXT NOT NULL,
 	PRIMARY KEY (publication_site_id, lang_id),
 	FOREIGN KEY (lang_id) REFERENCES Language(id),
 	FOREIGN KEY (publication_site_id) REFERENCES PublicationSite(id)
@@ -97,9 +97,9 @@ CREATE TABLE IF NOT EXISTS Characteristics (
 	dim_z INTEGER,
 	cover_id INTEGER,
 	illustration_id INTEGER,
-	FOREIGN KEY (publication_id) REFERENCES Pubication(id),
+	FOREIGN KEY (publication_id) REFERENCES Publication(id),
 	FOREIGN KEY (cover_id) REFERENCES CoveragesTypes(id),
-	FOREIGN KEY (illustration_id) REFERENCES IllustatinonTypes(id)
+	FOREIGN KEY (illustration_id) REFERENCES IllustratinonTypes(id)
 );
 
 CREATE TABLE IF NOT EXISTS CharacteristicsAdditional (
