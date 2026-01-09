@@ -13,6 +13,6 @@ COPY pyproject.toml uv.lock ./
 
 RUN uv sync --no-dev --frozen
 
-COPY . .
+COPY src/ ./src/
 
-CMD ["uv", "run", "main.py"]
+CMD ["uv", "run", "python", "-m", "src.__main__"]
