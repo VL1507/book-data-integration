@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS CharacteristicsAdditional (
 
 CREATE TABLE IF NOT EXISTS CharacteristicsGenre (
     characteristic_id INTEGER NOT NULL,
-	genre_id INTEGER NOT NULL UNIQUE,
+	genre_id INTEGER NOT NULL,
 	PRIMARY KEY (genre_id, characteristic_id),
 	FOREIGN KEY (genre_id) REFERENCES Genre(id),
 	FOREIGN KEY (characteristic_id) REFERENCES Characteristics(publication_id)
