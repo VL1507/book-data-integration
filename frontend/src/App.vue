@@ -60,7 +60,7 @@ nav a:first-of-type {
 
     <footer class="footer">
       <div class="footer-content">
-        <p>&copy; 2024 BookStore. Все права защищены.</p>
+        <p>&copy; 2026 BookStore. Все права защищены.</p>
       </div>
     </footer>
   </div>
