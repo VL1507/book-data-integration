@@ -21,5 +21,28 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
 
+  my-mysql:
+    build:
+      context: ./my-mysql/
+      dockerfile: Dockerfile
+    container_name: my-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATA_MYSQL_PASSWORD}
+      MYSQL_DATABASE: app
+    ports:
+      - "3307:3306"
+    expose:
+      - "3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p221683"]
+      timeout: 30s
+      retries: 10
+      interval: 10s
+      start_period: 40s
+
+
 volumes:
   venv_volume:
+  mysql_data:
