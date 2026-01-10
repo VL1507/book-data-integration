@@ -78,9 +78,24 @@ class ChitaiGorodSpider(Spider):
             item["dim_y"] = None
             item["dim_z"] = None
         else:
-            dim_split = dim.strip().split()[0].split("x")
+            dim_split = dim.replace(".", "").strip().split("x")
             dim_split.extend([None, None, None])  # type: ignore
-            item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
+
+            dim_x = dim_split[0]
+            if dim_x is not None and dim_x.isdigit():
+                dim_x = int(dim_x)
+
+            dim_y = dim_split[1]
+            if dim_y is not None and dim_y.isdigit():
+                dim_y = int(dim_y)
+
+            dim_z = dim_split[2]
+            if dim_z is not None and dim_z.isdigit():
+                dim_z = int(dim_z)
+
+            item["dim_x"] = dim_x
+            item["dim_y"] = dim_y
+            item["dim_z"] = dim_z
 
         item["books_name"] = response.css("h1.product-detail-page__title::text").get()
 
