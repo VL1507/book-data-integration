@@ -152,7 +152,7 @@ class CharacteristicsAdditional(Base):
 class CharacteristicsGenre(Base):
     __tablename__ = "CharacteristicsGenre"
     characteristic_id: Mapped[int] = mapped_column(
-        ForeignKey("Characteristics.publication_id"), primary_key=True, nullable=False
+        ForeignKey("Characteristics.id"), primary_key=True, nullable=False
     )
     genre_id: Mapped[int] = mapped_column(
         ForeignKey("Genre.id"), primary_key=True, nullable=False
