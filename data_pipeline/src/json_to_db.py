@@ -314,7 +314,7 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             if book_item.page_count is None:
                 logger.debug("""continue - book_item.page_count is None""")
                 continue
-            
+
             for isbn in book_item.isbn:
                 characteristics = Characteristics(
                     publication_id=publication.id,
@@ -337,9 +337,7 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
                 # CharacteristicsGenre
                 if characteristics.id is None:
-                    logger.debug(
-                        """continue - characteristics.id is None"""
-                    )
+                    logger.debug("""continue - characteristics.id is None""")
                     continue
                 for genre in genres:
                     if genre.id is None:
@@ -353,4 +351,5 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             session.flush()
 
+            session.commit()
         session.commit()
