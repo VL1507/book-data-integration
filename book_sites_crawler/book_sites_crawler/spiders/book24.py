@@ -74,21 +74,22 @@ class Book24Spider(Spider):
         if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
             return
 
-        year = (characteristics.xpath(
-                './/span[contains(., "Год издания")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
-            )
-            .get())
+        year = characteristics.xpath(
+            './/span[contains(., "Год издания")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+        ).get()
         if year is not None:
-            year = int(year.strip())
+            if year.strip().isdigit():
+                year = int(year.strip())
         item["year"] = year
 
-        item["page_count"] = (
-            characteristics.xpath(
-                './/span[contains(., " Количество страниц: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
-            )
-            .get(default="")
-            .strip()
-        )
+        page_count = characteristics.xpath(
+            './/span[contains(., " Количество страниц: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
+        ).get()
+        if page_count is not None:
+            if page_count.strip().isdigit():
+                page_count = int(page_count.strip())
+
+        item["page_count"] = page_count
 
         dim = characteristics.xpath(
             './/span[contains(., " Формат: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
