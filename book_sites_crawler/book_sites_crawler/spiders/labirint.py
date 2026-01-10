@@ -74,9 +74,12 @@ class LabirintSpider(Spider):
         if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
             return
 
-        item["year"] = characteristics.css(
+        year = characteristics.css(
             'div._name_mmfyx_9:contains("Издательство") + div span:last-child::text'
         ).get()
+        if year is not None and year.isdigit():
+            year = int(year)
+        item["year"] = year
 
         item["page_count"] = characteristics.css(
             'div._feature_mmfyx_1 div._name_mmfyx_9:contains("Страниц") ~ div.text-black span::text'
