@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from src.data.books_data import Book, books_db
+from data.books_data import Book, books_db
 
 app = FastAPI(title="Book API", description="API для работы с книгами")
 
