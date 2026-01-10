@@ -68,9 +68,13 @@ class ChitaiGorodSpider(Spider):
             'span[itemprop="datePublished"] span::text'
         ).get()
 
-        item["page_count"] = characteristics.css(
+        page_count = characteristics.css(
             'span[itemprop="numberOfPages"] span::text'
         ).get()
+        if page_count is not None and page_count.isdigit():
+            page_count = int(page_count)
+            
+        item["page_count"] = page_count
 
         dim = characteristics.css('span[itemprop="size"] span::text').get()
         if dim is None:
