@@ -98,7 +98,22 @@ class LabirintSpider(Spider):
         else:
             dim_split = dim.split("x")
             dim_split.extend([None, None, None])  # type: ignore
-            item["dim_x"], item["dim_y"], item["dim_z"], *_ = dim_split
+
+            dim_x = dim_split[0]
+            if dim_x is not None and dim_x.isdigit():
+                dim_x = int(dim_x)
+
+            dim_y = dim_split[1]
+            if dim_y is not None and dim_y.isdigit():
+                dim_y = int(dim_y)
+
+            dim_z = dim_split[2]
+            if dim_z is not None and dim_z.isdigit():
+                dim_z = int(dim_z)
+
+            item["dim_x"] = dim_x
+            item["dim_y"] = dim_y
+            item["dim_z"] = dim_z
 
         item["books_name"] = response.xpath("//h1/text()[1]").get()
 
