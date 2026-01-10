@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS CoveragesTypes (
 	name VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS IllustratinonTypes (
+CREATE TABLE IF NOT EXISTS IllustrationTypes (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL
 );
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Characteristics (
 	illustration_id INTEGER,
 	FOREIGN KEY (publication_id) REFERENCES Publication(id),
 	FOREIGN KEY (cover_id) REFERENCES CoveragesTypes(id),
-	FOREIGN KEY (illustration_id) REFERENCES IllustratinonTypes(id)
+	FOREIGN KEY (illustration_id) REFERENCES IllustrationTypes(id)
 );
 
 CREATE TABLE IF NOT EXISTS CharacteristicsAdditional (
