@@ -81,9 +81,12 @@ class LabirintSpider(Spider):
             year = int(year)
         item["year"] = year
 
-        item["page_count"] = characteristics.css(
+        page_count = characteristics.css(
             'div._feature_mmfyx_1 div._name_mmfyx_9:contains("Страниц") ~ div.text-black span::text'
         ).get()
+        if page_count is not None and page_count.isdigit():
+            page_count = int(page_count)
+        item["page_count"] = page_count
 
         dim = characteristics.css(
             'div._feature_mmfyx_1 div._name_mmfyx_9:contains("Размеры") ~ div.text-black span::text'
