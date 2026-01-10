@@ -44,7 +44,7 @@ services:
 
   data-pipeline:
     profiles: ["data-pipeline"]
-    container_name: book_backend
+    container_name: data-pipeline
     build: ./data_pipeline/
     depends_on:
       my-mysql:
