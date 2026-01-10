@@ -28,7 +28,7 @@ class LabirintSpider(Spider):
         #
         "LOG_LEVEL": "INFO",
     }
-    page_count_limit = 40
+    page_count_limit = 4
     page_count = 0
 
     def parse(self, response: Response, **kwargs: Any) -> Any:
@@ -109,7 +109,7 @@ class LabirintSpider(Spider):
 
         # PublicationSite
         current_price = response.xpath(
-            './/*[@id="__nuxt"]/main/article/div[5]/section[5]/div/div[1]/div/div[1]/text()'
+            '//*[@id="__nuxt"]/main/article/div[2]/meta[@itemprop="price"]/@content'
         ).get()
         if current_price:
             current_price = current_price.replace("\xa0", "").strip()
