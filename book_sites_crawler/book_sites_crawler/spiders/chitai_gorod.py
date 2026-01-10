@@ -64,16 +64,16 @@ class ChitaiGorodSpider(Spider):
         if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
             return
 
-        item["year"] = characteristics.css(
-            'span[itemprop="datePublished"] span::text'
-        ).get()
+        year = characteristics.css('span[itemprop="datePublished"] span::text').get()
+        if year is not None and year.isdigit():
+            year = int(year)
+        item["year"] = year
 
         page_count = characteristics.css(
             'span[itemprop="numberOfPages"] span::text'
         ).get()
         if page_count is not None and page_count.isdigit():
             page_count = int(page_count)
-            
         item["page_count"] = page_count
 
         dim = characteristics.css('span[itemprop="size"] span::text').get()
