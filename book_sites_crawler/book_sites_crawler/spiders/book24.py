@@ -74,13 +74,13 @@ class Book24Spider(Spider):
         if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
             return
 
-        item["year"] = (
-            characteristics.xpath(
+        year = (characteristics.xpath(
                 './/span[contains(., "Год издания")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
             )
-            .get(default="")
-            .strip()
-        )
+            .get())
+        if year is not None:
+            year = int(year.strip())
+        item["year"] = year
 
         item["page_count"] = (
             characteristics.xpath(
