@@ -2,6 +2,7 @@ from typing import List, Optional
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from data.books_data import Book, books_db
@@ -23,7 +24,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Book API is running"}
+    return RedirectResponse(url="/docs")
 
 
 @app.get("/books/{book_id}", response_model=Book)
