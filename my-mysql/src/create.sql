@@ -90,8 +90,8 @@ CREATE TABLE IF NOT EXISTS Annotation (
 CREATE TABLE IF NOT EXISTS Characteristics (
 	publication_id INTEGER PRIMARY KEY,
 	ISBN VARCHAR(255) NOT NULL,
-	year INTEGER,
-	page_count INTEGER,
+	year INTEGER NOT NULL,
+	page_count INTEGER NOT NULL,
 	dim_x INTEGER,
 	dim_y INTEGER,
 	dim_z INTEGER,

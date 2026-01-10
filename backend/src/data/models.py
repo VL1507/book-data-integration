@@ -1,8 +1,8 @@
-from typing import List, Optional
+from typing import Optional
 
-from sqlalchemy import REAL, Column, ForeignKey, Integer, String, Table, Text
+from sqlalchemy import REAL, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(AsyncAttrs, DeclarativeBase):
