@@ -86,8 +86,8 @@ class Characteristics(Base):
     __tablename__ = "Characteristics"
 
     ISBN: Mapped[str] = mapped_column(String)
-    year: Mapped[int] = mapped_column(Integer)
-    page_count: Mapped[int] = mapped_column(Integer)
+    year: Mapped[Optional[int]] = mapped_column(Integer)
+    page_count: Mapped[Optional[int]] = mapped_column(Integer)
     publication_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("Publication.id"), primary_key=True
     )
