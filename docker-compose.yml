@@ -42,6 +42,14 @@ services:
       interval: 10s
       start_period: 40s
 
+  data-pipeline:
+    profiles: ["data-pipeline"]
+    container_name: book_backend
+    build: ./data_pipeline/
+    depends_on:
+      my-mysql:
+        condition: service_healthy
+
 volumes:
   venv_volume:
   mysql_data:
