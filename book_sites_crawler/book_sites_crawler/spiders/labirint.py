@@ -28,7 +28,7 @@ class LabirintSpider(Spider):
         #
         "LOG_LEVEL": "INFO",
     }
-    page_count_limit = 4
+    page_count_limit = 40
     page_count = 0
 
     def parse(self, response: Response, **kwargs: Any) -> Any:
