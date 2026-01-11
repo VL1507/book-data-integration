@@ -58,7 +58,7 @@ class DataShow:
         self.cnt += 1
         stamp = time.perf_counter()
         self.last.append(f'Book {self.cnt}/{self.limit}: {resp}&{stamp-self.start}s')
-        self = self[-self.k:]
+        self.last = self.last[-self.k:]
 
     def clear(self):
         print('\r'*self.k)
