@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@vueform/slider':
+        specifier: ^2.1.10
+        version: 2.1.10
       axios:
         specifier: ^1.13.2
         version: 1.13.2
@@ -757,6 +760,9 @@ packages:
         optional: true
       vue:
         optional: true
+
+  '@vueform/slider@2.1.10':
+    resolution: {integrity: sha512-L2G3Ju51Yq6yWF2wzYYsicUUaH56kL1QKGVtimUVHT1K1ADcRT94xVyIeJpS0klliVEeF6iMZFbdXtHq8AsDHw==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2400,6 +2406,8 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
       vue: 3.5.24(typescript@5.9.3)
+
+  '@vueform/slider@2.1.10': {}
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
