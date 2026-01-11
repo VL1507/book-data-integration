@@ -138,7 +138,7 @@ class CharacteristicsAdditional(Base):
     __tablename__ = "CharacteristicsAdditional"
 
     characteristic_id: Mapped[int] = mapped_column(
-        ForeignKey("Characteristics.publication_id"), primary_key=True
+        ForeignKey("Characteristics.publication_site_id"), primary_key=True
     )
     additional_id: Mapped[int] = mapped_column(
         ForeignKey("AdditionalCharacteristics.id"), primary_key=True
