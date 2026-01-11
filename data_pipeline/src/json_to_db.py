@@ -129,8 +129,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # Language
             if book_item.lang is None:
-                logger.debug("continue - book_item.lang is None")
-                continue
+                # logger.debug("continue - book_item.lang is None")
+                # continue
+                book_item.lang = "Русский(None)"
 
             language_key = book_item.lang
             language = language_cache.get(language_key)
@@ -169,6 +170,23 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                     )
                     session.add(publishing_house)
                 publishing_house_cache[publishing_house_key] = publishing_house
+
+            session.flush()
+
+            # ISBN
+            if len(book_item.isbn) == 0:
+                logger.debug("continue - len(book_item.isbn) == 0")
+                continue
+
+            for book_isbn in book_item.isbn:
+                isbn = session.scalar(select(ISBN).where(ISBN.isbn == book_isbn))
+                if isbn is None:
+                    isbn = ISBN(
+                        isbn=book_isbn,
+                        publication_id=publication.id,
+                        publisher_id=publishing_house.id,
+                    )
+                    session.add(isbn)
 
             session.flush()
 
@@ -218,61 +236,54 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             session.flush()
 
-            # ISBN
-
-            for book_isbn in book_item.isbn:
-                # isbn = # FIXME
-                    isbn = ISBN(
-                        isbn=book_isbn,
-                        publication_site_id=publication_site.id,
-                        publisher_id=publishing_house.id,
-                    )
-                    session.add(isbn)
-
-            session.flush()
-
             # CoveragesTypes
             if book_item.coverages_types_name is None:
-                logger.debug("continue - book_item.coverages_types_name is None")
-                continue
-
-            coverages_types_key = book_item.coverages_types_name
-            coverages_types = coverages_types_cache.get(coverages_types_key)
-            if coverages_types is None:
-                coverages_types = session.scalar(
-                    select(CoveragesTypes).where(
-                        CoveragesTypes.name == book_item.coverages_types_name
-                    )
-                )
+                logger.debug("- book_item.coverages_types_name is None")
+                # continue
+                coverages_types = None
+            else:
+                coverages_types_key = book_item.coverages_types_name
+                coverages_types = coverages_types_cache.get(coverages_types_key)
                 if coverages_types is None:
-                    coverages_types = CoveragesTypes(
-                        name=book_item.coverages_types_name
+                    coverages_types = session.scalar(
+                        select(CoveragesTypes).where(
+                            CoveragesTypes.name == book_item.coverages_types_name
+                        )
                     )
-                    session.add(coverages_types)
-                coverages_types_cache[coverages_types_key] = coverages_types
+                    if coverages_types is None:
+                        coverages_types = CoveragesTypes(
+                            name=book_item.coverages_types_name
+                        )
+                        session.add(coverages_types)
+                    coverages_types_cache[coverages_types_key] = coverages_types
 
             session.flush()
 
             # IllustrationTypes
 
             if book_item.illustration_types_name is None:
-                logger.debug("continue - book_item.illustration_types_name is None")
-                continue
-
-            illustration_types_key = book_item.illustration_types_name
-            illustration_types = illustration_types_cache.get(illustration_types_key)
-            if illustration_types is None:
-                illustration_types = session.scalar(
-                    select(IllustrationTypes).where(
-                        IllustrationTypes.name == book_item.illustration_types_name
-                    )
+                logger.debug("- book_item.illustration_types_name is None")
+                # continue
+                illustration_types = None
+            else:
+                illustration_types_key = book_item.illustration_types_name
+                illustration_types = illustration_types_cache.get(
+                    illustration_types_key
                 )
                 if illustration_types is None:
-                    illustration_types = IllustrationTypes(
-                        name=book_item.illustration_types_name
+                    illustration_types = session.scalar(
+                        select(IllustrationTypes).where(
+                            IllustrationTypes.name == book_item.illustration_types_name
+                        )
                     )
-                    session.add(illustration_types)
-                illustration_types_cache[illustration_types_key] = illustration_types
+                    if illustration_types is None:
+                        illustration_types = IllustrationTypes(
+                            name=book_item.illustration_types_name
+                        )
+                        session.add(illustration_types)
+                    illustration_types_cache[illustration_types_key] = (
+                        illustration_types
+                    )
 
             session.flush()
 
@@ -293,8 +304,12 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                 dim_x=book_item.dim_x,
                 dim_y=book_item.dim_y,
                 dim_z=book_item.dim_z,
-                cover_id=coverages_types.id,
-                illustration_id=illustration_types.id,
+                cover_id=coverages_types.id
+                if coverages_types is not None
+                else coverages_types,
+                illustration_id=illustration_types.id
+                if illustration_types is not None
+                else illustration_types,
             )
 
             session.add(characteristics)
@@ -324,7 +339,8 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                 # CharacteristicsGenre
 
                 characteristics_genre = CharacteristicsGenre(
-                    characteristic_id=characteristics.id, genre_id=genre.id
+                    characteristic_id=characteristics.publication_site_id,
+                    genre_id=genre.id,
                 )
                 session.add(characteristics_genre)
 
