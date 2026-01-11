@@ -3,11 +3,6 @@ CREATE TABLE IF NOT EXISTS Language (
 	lang VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS Books (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	name VARCHAR(255) NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS Sites (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	site VARCHAR(255) NOT NULL,
@@ -47,10 +42,7 @@ CREATE TABLE IF NOT EXISTS AdditionalCharacteristics (
 
 CREATE TABLE IF NOT EXISTS Publication (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	book_id INTEGER NOT NULL,
-	publisher_id INTEGER NOT NULL,
-	FOREIGN KEY (publisher_id) REFERENCES PublishingHouses(id),
-	FOREIGN KEY (book_id) REFERENCES Books(id)
+	name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS Recension (
@@ -90,7 +82,9 @@ CREATE TABLE IF NOT EXISTS Annotation (
 CREATE TABLE IF NOT EXISTS ISBN (
 	isbn VARCHAR(255) PRIMARY KEY,
 	publication_site_id INTEGER NOT NULL,
+	publisher_id INTEGER NOT NULL,
 	FOREIGN KEY (publication_site_id) REFERENCES PublicationSite(id)
+	FOREIGN KEY (publisher_id) REFERENCES PublishingHouses(id)
 );
 
 CREATE TABLE IF NOT EXISTS Characteristics (
@@ -121,5 +115,5 @@ CREATE TABLE IF NOT EXISTS CharacteristicsGenre (
 	genre_id INTEGER NOT NULL,
 	PRIMARY KEY (genre_id, characteristic_id),
 	FOREIGN KEY (genre_id) REFERENCES Genre(id),
-	FOREIGN KEY (characteristic_id) REFERENCES Characteristics(id)
+	FOREIGN KEY (characteristic_id) REFERENCES Characteristics(publication_site_id)
 );
