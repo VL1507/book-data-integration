@@ -4,8 +4,6 @@ services:
     build: ./backend/
     ports:
       - "8000:8000"
-    volumes:
-      - venv_volume:/venv
 
   frontend:
     container_name: book-frontend
@@ -50,5 +48,4 @@ services:
         condition: service_healthy
 
 volumes:
-  venv_volume:
   mysql_data:
