@@ -45,7 +45,7 @@ services:
     container_name: data-pipeline
     build: ./data_pipeline/
     environment:
-      - DATABASE_URL="mysql://root:{DATA_MYSQL_PASSWORD}@my-mysql:3307/app"
+      DATABASE_URL: mysql+pymysql://root:${DATA_MYSQL_PASSWORD}@my-mysql:3307/app
     depends_on:
       my-mysql:
         condition: service_healthy
@@ -53,8 +53,3 @@ services:
 volumes:
   venv_volume:
   mysql_data:
-
-
-networks:
-  default:
-    name: book-network
