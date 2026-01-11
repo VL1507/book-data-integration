@@ -58,6 +58,7 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
         illustration_types_cache: dict[str, IllustrationTypes] = {}
 
         book_i = 0
+        book_success = 0
         for book_item in book_items:
             logger.debug(book_i)
             book_i += 1
@@ -318,9 +319,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # Genre
 
-            if len(book_item.genre) == 0:
-                logger.debug("continue - len(book_item.genre) == 0")
-                continue
+            # if len(book_item.genre) == 0:
+            #     logger.debug("continue - len(book_item.genre) == 0")
+            #     continue
 
             for book_genre in book_item.genre:
                 genre_key = book_genre
@@ -351,4 +352,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             session.flush()
 
             session.commit()
+            book_success += 1
         session.commit()
+
+        logger.info(
+            f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%"
+        )
