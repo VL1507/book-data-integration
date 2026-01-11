@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS ISBN (
 	isbn VARCHAR(255) PRIMARY KEY,
 	publication_site_id INTEGER NOT NULL,
 	publisher_id INTEGER NOT NULL,
-	FOREIGN KEY (publication_site_id) REFERENCES PublicationSite(id)
+	FOREIGN KEY (publication_site_id) REFERENCES PublicationSite(id),
 	FOREIGN KEY (publisher_id) REFERENCES PublishingHouses(id)
 );
 
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS CharacteristicsAdditional (
 	value TEXT NOT NULL,
 	PRIMARY KEY (characteristic_id, additional_id),
 	FOREIGN KEY (additional_id) REFERENCES AdditionalCharacteristics(id),
-	FOREIGN KEY (characteristic_id) REFERENCES Characteristics(publication_id)
+	FOREIGN KEY (characteristic_id) REFERENCES Characteristics(publication_site_id)
 );
 
 CREATE TABLE IF NOT EXISTS CharacteristicsGenre (
