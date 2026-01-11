@@ -7,9 +7,7 @@ services:
 
   frontend:
     container_name: book-frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    build: ./frontend/
     ports:
       - "5173:5173"
     volumes:
@@ -38,7 +36,7 @@ services:
       start_period: 40s
 
   data-pipeline:
-    profiles: ["data-pipeline"]
+    profiles: [ "data-pipeline" ]
     container_name: data-pipeline
     build: ./data_pipeline/
     environment:
