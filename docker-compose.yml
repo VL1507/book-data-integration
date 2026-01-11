@@ -22,9 +22,7 @@ services:
       - WATCHPACK_POLLING=true
 
   my-mysql:
-    build:
-      context: ./my-mysql/
-      dockerfile: Dockerfile
+    build: ./my-mysql/
     container_name: my-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DATA_MYSQL_PASSWORD}
@@ -34,7 +32,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p221683" ]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DATA_MYSQL_PASSWORD}" ]
       timeout: 30s
       retries: 10
       interval: 10s
@@ -45,7 +43,7 @@ services:
     container_name: data-pipeline
     build: ./data_pipeline/
     environment:
-      DATABASE_URL: mysql+pymysql://root:${DATA_MYSQL_PASSWORD}@my-mysql:3307/app
+      DATABASE_URL: mysql+pymysql://root:${DATA_MYSQL_PASSWORD}@my-mysql:3306/app
     depends_on:
       my-mysql:
         condition: service_healthy
