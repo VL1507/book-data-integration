@@ -6,6 +6,7 @@ load_dotenv()
 
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+LOGGING_LEVEL = os.getenv("LOGGING_LEVEL")
 
 
 JSON_PATH_BOOK24 = Path("./results/json/book24/book24_2026-01-10T15-56-20+00-00.json")
