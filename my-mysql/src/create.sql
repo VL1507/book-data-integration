@@ -87,10 +87,14 @@ CREATE TABLE IF NOT EXISTS Annotation (
 	FOREIGN KEY (publication_site_id) REFERENCES PublicationSite(id)
 );
 
+CREATE TABLE IF NOT EXISTS ISBN (
+	isbn VARCHAR(255) PRIMARY KEY,
+	publication_site_id INTEGER NOT NULL,
+	FOREIGN KEY (publication_site_id) REFERENCES PublicationSite(id)
+);
+
 CREATE TABLE IF NOT EXISTS Characteristics (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,
-	publication_id INTEGER,
-	ISBN VARCHAR(255) NOT NULL,
+	publication_site_id INTEGER PRIMARY KEY AUTO_INCREMENT,
 	year INTEGER NOT NULL,
 	page_count INTEGER NOT NULL,
 	dim_x INTEGER,
@@ -98,7 +102,7 @@ CREATE TABLE IF NOT EXISTS Characteristics (
 	dim_z INTEGER,
 	cover_id INTEGER,
 	illustration_id INTEGER,
-	FOREIGN KEY (publication_id) REFERENCES Publication(id),
+	FOREIGN KEY (publication_site_id) REFERENCES PublicationSite(id),
 	FOREIGN KEY (cover_id) REFERENCES CoveragesTypes(id),
 	FOREIGN KEY (illustration_id) REFERENCES IllustrationTypes(id)
 );
