@@ -21,7 +21,7 @@ def main():
         book_items = load_from_json(path=json_path)
         print(f'Starts dumping {len(book_items)} items to database')
         logger.debug(f"{len(book_items) = }")
-        print(dump_to_sql(book_items=book_items))
+        dump_to_sql(book_items=book_items)
 
 
 if __name__ == "__main__":

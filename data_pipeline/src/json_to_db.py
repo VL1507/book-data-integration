@@ -72,7 +72,8 @@ class DataShow:
     def print(self):
         width, _ = shutil.get_terminal_size()
         parsed = [('.'*(width-len(x)+1)).join(x.split('&')) if len(x) > 0 else '.'*width for x in self.last]
-        print("\n".join(parsed))
+        sys.stdout.write("\n".join(parsed))
+        sys.stdout.flush()
 
 @timer
 def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
