@@ -5,8 +5,11 @@ import logging
 
 logging.basicConfig(
     level=LOGGING_LEVEL,
-    format="%(asctime)s | %(levelname)-7s | %(filename)s:%(lineno)d | %(name)-20s | %(message)s",
+    format="%(asctime)s | %(levelname)-7s | %(filename)-20s:%(lineno)-4d | %(name)-20s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.FileHandler('data-pipeline.log'),
+    ]
 )
 logger = logging.getLogger(name=__name__)
 
@@ -16,7 +19,8 @@ def main():
 
     for json_path in (JSON_PATH_BOOK24, JSON_PATH_CHITAI_GOROD, JSON_PATH_LABIRINT):
         book_items = load_from_json(path=json_path)
-        logger.info(f"{len(book_items) = }")
+        print(f'Starts dumping {len(book_items)} items to database')
+        logger.debug(f"{len(book_items) = }")
         print(dump_to_sql(book_items=book_items))
 
 
