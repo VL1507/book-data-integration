@@ -55,8 +55,11 @@ class DataShow:
         self.cnt = 0
         self.last = ['']*self.k
     
-    def add(self, resp: str):
+    def inc(self):
         self.cnt += 1
+
+    def add(self, resp: str):
+        self.inc()
         stamp = time.perf_counter()
         self.last.append(f'Book {self.cnt}/{self.limit}: {resp}&{(stamp-self.start):.4f}s')
         self.last = self.last[-self.k:]
@@ -398,8 +401,7 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             session.commit()
             book_success += 1
-            data_show.add("finished - all data added")
-            data_show.reprint()
+            data_show.inc()
         session.commit()
         data_show.clear()
         print(f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%")
