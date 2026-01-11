@@ -1,13 +1,17 @@
 # Сделано по примеру https://github.com/astral-sh/uv-docker-example/blob/main/multistage.Dockerfile
 
 # Установка зависимостей с помощью uv
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim AS builder
 
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
-
 ENV UV_NO_DEV=1
-
 ENV UV_PYTHON_DOWNLOADS=0
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    pkg-config \
+    default-libmysqlclient-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -22,7 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked
 
 # Запуск с помощью обычного python
-FROM python:3.13-slim-bookworm
+FROM python:3.11-slim-bookworm
 
 RUN groupadd --system --gid 10000 nonroot \
     && useradd --system --gid 10000 --uid 10000 --create-home nonroot
