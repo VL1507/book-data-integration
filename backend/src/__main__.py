@@ -1,8 +1,7 @@
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import RedirectResponse
 
 app = FastAPI(title="Book API", description="API для работы с книгами")
 

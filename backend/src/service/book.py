@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from repository.book import BookRepository
 
 
@@ -6,4 +7,5 @@ from repository.book import BookRepository
 class BookService:
     user_repository: BookRepository
 
-    async def get_book_by_isbn(self, isbn: str):pass
+    async def get_book_by_isbn(self, isbn: str):
+        pass
