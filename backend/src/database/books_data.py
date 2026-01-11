@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+
 
 class Book(BaseModel):
     id: int
@@ -9,9 +9,11 @@ class Book(BaseModel):
     genre: list[str]
     image_url: str
 
+
 class Annotation(BaseModel):
     language: str
     annotation: str
+
 
 class Publication(BaseModel):
     id: int
@@ -26,6 +28,7 @@ class Publication(BaseModel):
     illustration_types_name: str | None
     coverages_types_name: str | None
     image_url: str | None
+
 
 class BookInfo(BaseModel):
     id: int
