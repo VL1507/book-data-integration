@@ -58,7 +58,7 @@ class DataShow:
     def add(self, resp: str):
         self.cnt += 1
         stamp = time.perf_counter()
-        self.last.append(f'Book {self.cnt}/{self.limit}: {resp}&{stamp-self.start}s')
+        self.last.append(f'Book {self.cnt}/{self.limit}: {resp}&{(stamp-self.start):.4f}s')
         self.last = self.last[-self.k:]
 
     def clear(self):
@@ -72,7 +72,7 @@ class DataShow:
     def print(self):
         width, _ = shutil.get_terminal_size()
         parsed = [('.'*(width-len(x)+1)).join(x.split('&')) if len(x) > 0 else '.'*width for x in self.last]
-        sys.stdout.write("\n".join(parsed))
+        sys.stdout.write("\n".join(parsed)+'\n')
         sys.stdout.flush()
 
 @timer
