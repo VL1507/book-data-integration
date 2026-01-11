@@ -81,9 +81,9 @@ CREATE TABLE IF NOT EXISTS Annotation (
 
 CREATE TABLE IF NOT EXISTS ISBN (
 	isbn VARCHAR(255) PRIMARY KEY,
-	publication_site_id INTEGER NOT NULL,
+	publication_id INTEGER NOT NULL,
 	publisher_id INTEGER NOT NULL,
-	FOREIGN KEY (publication_site_id) REFERENCES PublicationSite(id),
+	FOREIGN KEY (publication_id) REFERENCES Publication(id),
 	FOREIGN KEY (publisher_id) REFERENCES PublishingHouses(id)
 );
 
