@@ -31,8 +31,6 @@ services:
       MYSQL_DATABASE: app
     ports:
       - "3307:3306"
-    expose:
-      - "3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -46,6 +44,8 @@ services:
     profiles: ["data-pipeline"]
     container_name: data-pipeline
     build: ./data_pipeline/
+    environment:
+      - DATABASE_URL="mysql://root:{DATA_MYSQL_PASSWORD}@my-mysql:3307/app"
     depends_on:
       my-mysql:
         condition: service_healthy
