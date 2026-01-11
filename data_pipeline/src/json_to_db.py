@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import shutil
 import time
+import sys
 
 from sqlalchemy import select
 
@@ -61,7 +62,8 @@ class DataShow:
         self.last = self.last[-self.k:]
 
     def clear(self):
-        print('\r'*self.k)
+        sys.stdout.write(f"\033[{self.k}A")
+        sys.stdout.write("\033[J")
     
     def reprint(self):
         self.clear()
@@ -399,6 +401,7 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             data_show.reprint()
         session.commit()
         data_show.clear()
+        print(f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%")
         logger.debug(
             f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%"
         )
