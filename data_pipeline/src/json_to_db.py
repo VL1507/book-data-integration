@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from sqlalchemy import select
+
 from db_conn import Session
 from wrap_timer import timer
 
@@ -19,10 +21,10 @@ from models import (
     CoveragesTypes,
     Genre,
     IllustrationTypes,
-    Books,
     PublicationSite,
     Publication,
     Recension,
+    ISBN,
 )
 
 import logging
@@ -46,56 +48,121 @@ def load_from_json(path: Path) -> list[BookSitesCrawlerItem]:
 @timer
 def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
     with Session() as session:
-        sites_cache: dict[tuple[str, str], Sites] = {}
-        publishing_house_cache: dict[tuple[str, str], Sites] = {}
+        publication_cache: dict[str, Publication] = {}
         authors_cache: dict[str, Authors] = {}
-        book_cache: dict[str, Books] = {}
-        coverages_types_cache: dict[str, CoveragesTypes] = {}
         language_cache: dict[str, Language] = {}
-        illustration_types_cache: dict[str, IllustrationTypes] = {}
+        publishing_house_cache: dict[tuple[str, str], PublishingHouses] = {}
+        sites_cache: dict[tuple[str, str], Sites] = {}
         genre_cache: dict[str, Genre] = {}
+        coverages_types_cache: dict[str, CoveragesTypes] = {}
+        illustration_types_cache: dict[str, IllustrationTypes] = {}
 
         book_i = 0
+        book_success = 0
         for book_item in book_items:
             logger.debug(book_i)
             book_i += 1
-            # Sites
-            site_key = (book_item.sites_site, book_item.sites_url)
-            site = sites_cache.get(site_key)
-            if site is None:
-                site = (
-                    session.query(Sites)
-                    .where(
-                        Sites.site == book_item.sites_site,
-                        Sites.url == book_item.sites_url,
-                    )
-                    .first()
-                )
-                if site is None:
-                    site = Sites(site=book_item.sites_site, url=book_item.sites_url)
-                    session.add(site)
-                sites_cache[site_key] = site
 
-            # PublishingHouse
-            if (
-                book_item.publishing_houses_name is None
-                # or book_item.publishing_houses_url is None
-            ):
+            # Publication
+            if book_item.books_name is None:
+                logger.debug("continue - book_item.books_name is None")
+                continue
+
+            publication_key = book_item.books_name
+            publication = publication_cache.get(publication_key)
+            if publication is None:
+                publication = session.scalar(
+                    select(Publication).where(Publication.name == book_item.books_name)
+                )
+                if publication is None:
+                    publication = Publication(name=book_item.books_name)
+                    session.add(publication)
+                publication_cache[publication_key] = publication
+
+            session.flush()
+
+            # Recension
+            recension = session.scalar(
+                select(Recension).where(Recension.publication_id == publication.id)
+            )
+            if recension is None:
+                if book_item.recension_link is not None:
+                    recension = Recension(
+                        publication_id=publication.id, link=book_item.recension_link
+                    )
+                    session.add(Recension)
+
+            session.flush()
+
+            # Authors
+            if len(book_item.authors_name) == 0:
+                logger.debug("continue - len(book_item.authors_name) == 0")
+                continue
+
+            for author_name in book_item.authors_name:
+                author_key = author_name
+                author = authors_cache.get(author_key)
+                if author is None:
+                    author = session.scalar(
+                        select(Authors).where(Authors.name == author_name)
+                    )
+                    if author is None:
+                        author = Authors(name=author_name)
+                        session.add(author)
+                    authors_cache[author_key] = author
+
+                session.flush()
+
+                # PublicationAuthors
+                publication_authors = session.scalar(
+                    select(PublicationAuthors).where(
+                        PublicationAuthors.publication_id == publication.id,
+                        PublicationAuthors.authors_id == author.id,
+                    )
+                )
+                if publication_authors is None:
+                    publication_authors = PublicationAuthors(
+                        publication_id=publication.id, authors_id=author.id
+                    )
+                    session.add(publication_authors)
+
+            session.flush()
+
+            # Language
+            if book_item.lang is None:
+                # logger.debug("continue - book_item.lang is None")
+                # continue
+                book_item.lang = "Русский(None)"
+
+            language_key = book_item.lang
+            language = language_cache.get(language_key)
+            if language is None:
+                language = session.scalar(
+                    select(Language).where(Language.lang == book_item.lang)
+                )
+                if language is None:
+                    language = Language(lang=book_item.lang)
+                    session.add(language)
+                language_cache[language_key] = language
+
+            session.flush()
+
+            # PublishingHouses
+            if book_item.publishing_houses_name is None:
                 logger.debug("continue - book_item.publishing_houses_name is None")
                 continue
+
             publishing_house_key = (
                 book_item.publishing_houses_name,
                 book_item.publishing_houses_url,
             )
             publishing_house = publishing_house_cache.get(publishing_house_key)
             if publishing_house is None:
-                publishing_house = (
-                    session.query(PublishingHouses)
-                    .where(
+                publishing_house = session.scalar(
+                    select(PublishingHouses).where(
                         PublishingHouses.name == book_item.publishing_houses_name,
                         PublishingHouses.url == book_item.publishing_houses_url,
                     )
-                    .first()
                 )
                 if publishing_house is None:
                     publishing_house = PublishingHouses(
@@ -105,157 +172,45 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                     session.add(publishing_house)
                 publishing_house_cache[publishing_house_key] = publishing_house
 
-            # Authors
-            authors: list[Authors] = []
-            for author_name in book_item.authors_name:
-                author_key = author_name
-                author = authors_cache.get(author_key)
+            session.flush()
 
-                if author is None:
-                    author = (
-                        session.query(Authors)
-                        .where(Authors.name == author_name)
-                        .first()
-                    )
-                    if author is None:
-                        author = Authors(name=author_name)
-                        session.add(author)
-                    authors_cache[author_key] = author
-                authors.append(author)
-
-            if len(authors) == 0:
-                logger.debug("continue - len(authors) == 0")
+            # ISBN
+            if len(book_item.isbn) == 0:
+                logger.debug("continue - len(book_item.isbn) == 0")
                 continue
 
-            # Books
-            if book_item.books_name is None:
-                logger.debug("continue - book_item.books_name is None")
-                continue
-            book_key = book_item.books_name
-            book = book_cache.get(book_key)
-            if book is None:
-                book = (
-                    session.query(Books)
-                    .where(Books.name == book_item.books_name)
-                    .first()
-                )
-                if book is None:
-                    book = Books(name=book_item.books_name)
-                    session.add(book)
-                book_cache[book_key] = book
-
-            # CoveragesTypes
-
-            if book_item.coverages_types_name is None:
-                # logger.debug("continue - book_item.coverages_types_name is None")
-                # continue
-                coverages_types = None
-            else:
-                coverages_types_key = book_item.coverages_types_name
-                coverages_types = coverages_types_cache.get(coverages_types_key)
-                if coverages_types is None:
-                    coverages_types = (
-                        session.query(CoveragesTypes)
-                        .where(CoveragesTypes.name == book_item.coverages_types_name)
-                        .first()
+            for book_isbn in book_item.isbn:
+                isbn = session.scalar(select(ISBN).where(ISBN.isbn == book_isbn))
+                if isbn is None:
+                    isbn = ISBN(
+                        isbn=book_isbn,
+                        publication_id=publication.id,
+                        publisher_id=publishing_house.id,
                     )
-                    if coverages_types is None:
-                        coverages_types = CoveragesTypes(
-                            name=book_item.coverages_types_name
-                        )
-                        session.add(coverages_types)
-
-            # Language
-            if book_item.lang is None:
-                logger.debug("- book_item.lang is None")
-                book_item.lang = "Русский"
-                # continue
-            language_key = book_item.lang
-            language = language_cache.get(language_key)
-            if language is None:
-                language = (
-                    session.query(Language)
-                    .where(Language.lang == book_item.lang)
-                    .first()
-                )
-                if language is None:
-                    language = Language(lang=book_item.lang)
-                    session.add(language)
-                language_cache[language_key] = language
-
-            # IllustrationTypes
-
-            if book_item.illustration_types_name is None:
-                # logger.debug("continue - book_item.illustration_types_name is None")
-                # continue
-                illustration_types = None
-            else:
-                illustration_types_key = book_item.illustration_types_name
-                illustration_types = illustration_types_cache.get(
-                    illustration_types_key
-                )
-                if illustration_types is None:
-                    illustration_types = (
-                        session.query(IllustrationTypes)
-                        .where(
-                            IllustrationTypes.name == book_item.illustration_types_name
-                        )
-                        .first()
-                    )
-                    if illustration_types is None:
-                        illustration_types = IllustrationTypes(
-                            name=book_item.illustration_types_name
-                        )
-                        session.add(illustration_types)
-                    illustration_types_cache[illustration_types_key] = (
-                        illustration_types
-                    )
-
-            # Genre
-            genres: list[Genre] = []
-
-            for genre_name in book_item.genre:
-                genre_key = genre_name
-                genre = genre_cache.get(genre_key)
-                if genre is None:
-                    genre = (
-                        session.query(Genre).where(Genre.genre == genre_name).first()
-                    )
-                    if genre is None:
-                        genre = Genre(genre=genre_name)
-                        session.add(genre)
-                    genre_cache[genre_key] = genre
-                genres.append(genre)
-
-            if len(genres) == 0:
-                logger.debug("len(genres) == 0")
-                # continue
-
-            # AdditionalCharacteristics
+                    session.add(isbn)
 
             session.flush()
 
-            # Publication
-            if book.id is None:
-                logger.debug("continue - book.id is None")
-                continue
-            if publishing_house.id is None:
-                logger.debug("continue - publishing_house.id is None")
-                continue
-            publication = Publication(book_id=book.id, publisher_id=publishing_house.id)
-            session.add(publication)
+            # Sites
+            site_key = (book_item.sites_site, book_item.sites_url)
+            site = sites_cache.get(site_key)
+            if site is None:
+                site = session.scalar(
+                    select(Sites).where(
+                        Sites.site == book_item.sites_site,
+                        Sites.url == book_item.sites_url,
+                    )
+                )
+                if site is None:
+                    site = Sites(site=book_item.sites_site, url=book_item.sites_url)
+                    session.add(site)
+                sites_cache[site_key] = site
 
             session.flush()
 
             # PublicationSite
-            if publication.id is None:
-                logger.debug("""continue - publication.id is None""")
-                continue
-            if site.id is None:
-                logger.debug("""continue - site.id is None""")
-                continue
             if book_item.publication_site_price is None:
-                logger.debug("""continue - book_item.publication_site_price is None""")
+                logger.debug("continue - book_item.publication_site_price is None")
                 continue
 
             publication_site = PublicationSite(
@@ -269,87 +224,137 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             session.flush()
 
             # Annotation
-            if publication_site.id is None:
-                logger.debug("""continue - publication_site.id""")
-                continue
-
             if book_item.description is None:
-                logger.debug("""continue - book_item.description is None""")
+                logger.debug("continue - book_item.publication_site_price is None")
                 # continue
             else:
-                if language.id is None:
-                    logger.debug("""continue - language.id is None""")
-                    # continue
-                else:
-                    annotation = Annotation(
-                        lang_id=language.id,
-                        publication_site_id=publication_site.id,
-                        description=book_item.description,
-                    )
-                    session.add(annotation)
-
-            # Recension
-
-            # PublicationAuthors
-            if publication.id is None:
-                logger.debug("""continue - publication.id is None""")
-                continue
-            for author in authors:
-                if author.id is None:
-                    continue
-                publication_authors = PublicationAuthors(
-                    authors_id=author.id, publication_id=publication.id
+                annotation = Annotation(
+                    publication_site_id=publication_site.id,
+                    lang_id=language.id,
+                    description=book_item.description,
                 )
-                session.add(publication_authors)
+                session.add(annotation)
 
-            # CharacteristicsAdditional
+            session.flush()
+
+            # CoveragesTypes
+            if book_item.coverages_types_name is None:
+                logger.debug("- book_item.coverages_types_name is None")
+                # continue
+                coverages_types = None
+            else:
+                coverages_types_key = book_item.coverages_types_name
+                coverages_types = coverages_types_cache.get(coverages_types_key)
+                if coverages_types is None:
+                    coverages_types = session.scalar(
+                        select(CoveragesTypes).where(
+                            CoveragesTypes.name == book_item.coverages_types_name
+                        )
+                    )
+                    if coverages_types is None:
+                        coverages_types = CoveragesTypes(
+                            name=book_item.coverages_types_name
+                        )
+                        session.add(coverages_types)
+                    coverages_types_cache[coverages_types_key] = coverages_types
+
+            session.flush()
+
+            # IllustrationTypes
+
+            if book_item.illustration_types_name is None:
+                logger.debug("- book_item.illustration_types_name is None")
+                # continue
+                illustration_types = None
+            else:
+                illustration_types_key = book_item.illustration_types_name
+                illustration_types = illustration_types_cache.get(
+                    illustration_types_key
+                )
+                if illustration_types is None:
+                    illustration_types = session.scalar(
+                        select(IllustrationTypes).where(
+                            IllustrationTypes.name == book_item.illustration_types_name
+                        )
+                    )
+                    if illustration_types is None:
+                        illustration_types = IllustrationTypes(
+                            name=book_item.illustration_types_name
+                        )
+                        session.add(illustration_types)
+                    illustration_types_cache[illustration_types_key] = (
+                        illustration_types
+                    )
+
+            session.flush()
+
+            # AdditionalCharacteristics
 
             # Characteristics
-            if publication.id is None:
-                logger.debug("""continue - publication.id is None""")
-                continue
             if book_item.year is None:
-                logger.debug("""continue - book_item.year is None""")
+                logger.debug("continue - book_item.year is None")
                 continue
             if book_item.page_count is None:
-                logger.debug("""continue - book_item.page_count is None""")
+                logger.debug("continue - book_item.page_count is None")
                 continue
 
-            for isbn in book_item.isbn:
-                characteristics = Characteristics(
-                    publication_id=publication.id,
-                    ISBN=isbn,
-                    year=book_item.year,
-                    page_count=book_item.page_count,
-                    dim_x=book_item.dim_x,
-                    dim_y=book_item.dim_y,
-                    dim_z=book_item.dim_z,
-                    cover_id=coverages_types.id
-                    if coverages_types is not None
-                    else coverages_types,
-                    illustration_id=illustration_types.id
-                    if illustration_types is not None
-                    else illustration_types,
-                )
-                session.add(characteristics)
+            characteristics = Characteristics(
+                publication_site_id=publication_site.id,
+                year=book_item.year,
+                page_count=book_item.page_count,
+                dim_x=book_item.dim_x,
+                dim_y=book_item.dim_y,
+                dim_z=book_item.dim_z,
+                cover_id=coverages_types.id
+                if coverages_types is not None
+                else coverages_types,
+                illustration_id=illustration_types.id
+                if illustration_types is not None
+                else illustration_types,
+            )
 
-                session.flush()
+            session.add(characteristics)
+
+            session.flush()
+
+            # Genre
+
+            # if len(book_item.genre) == 0:
+            #     logger.debug("continue - len(book_item.genre) == 0")
+            #     continue
+
+            for book_genre in book_item.genre:
+                genre_key = book_genre
+                genre = genre_cache.get(genre_key)
+                if genre is None:
+                    genre = session.scalar(
+                        select(Genre).where(Genre.genre == book_genre)
+                    )
+                    if genre is None:
+                        genre = Genre(genre=book_genre)
+                        session.add(genre)
+                    genre_cache[genre_key] = genre
+
+                    session.flush()
 
                 # CharacteristicsGenre
-                if characteristics.id is None:
-                    logger.debug("""continue - characteristics.id is None""")
-                    continue
-                for genre in genres:
-                    if genre.id is None:
-                        logger.debug("""continue - genre.id is None""")
-                        continue
-                    characteristics_genre = CharacteristicsGenre(
-                        characteristic_id=characteristics.id,
-                        genre_id=genre.id,
-                    )
-                    session.add(characteristics_genre)
+
+                characteristics_genre = CharacteristicsGenre(
+                    characteristic_id=characteristics.publication_site_id,
+                    genre_id=genre.id,
+                )
+                session.add(characteristics_genre)
+
+            session.flush()
+
+            # CharacteristicsAdditional
 
             session.flush()
 
             session.commit()
+            book_success += 1
         session.commit()
+
+        logger.info(
+            f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%"
+        )

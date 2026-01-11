@@ -78,7 +78,7 @@ class ISBN(Base):
     __tablename__ = "ISBN"
 
     isbn: Mapped[str] = mapped_column(String, primary_key=True)
-    publication_site_id: Mapped[int] = mapped_column(ForeignKey("PublicationSite.id"))
+    publication_id: Mapped[int] = mapped_column(ForeignKey("Publication.id"))
     publisher_id: Mapped[int] = mapped_column(ForeignKey("PublishingHouses.id"))
 
 class Characteristics(Base):
