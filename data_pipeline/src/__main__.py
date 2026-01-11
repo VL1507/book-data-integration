@@ -13,9 +13,10 @@ logging.basicConfig(
 def main():
     print("Hello from data-pipeline!")
 
-    book_items = load_from_json(path=JSON_PATH_LABIRINT)
-    print(f"{len(book_items) = }")
-    print(dump_to_sql(book_items=book_items))
+    for json_path in (JSON_PATH_BOOK24, JSON_PATH_CHITAI_GOROD, JSON_PATH_LABIRINT):
+        book_items = load_from_json(path=json_path)
+        print(f"{len(book_items) = }")
+        print(dump_to_sql(book_items=book_items))
 
 
 if __name__ == "__main__":
