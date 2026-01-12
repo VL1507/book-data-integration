@@ -8,4 +8,8 @@ class BookService:
     book_repository: BookRepository
 
     async def get_book_by_isbn(self, isbn: str):
-        pass
+        result = await self.book_repository.get_book_by_isbn(isbn=isbn)
+        if result is None:
+            return None
+        book = ...
+        return book

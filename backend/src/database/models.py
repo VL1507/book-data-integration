@@ -72,7 +72,7 @@ class Publication(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String)
-    
+
 
 class ISBN(Base):
     __tablename__ = "ISBN"
@@ -81,9 +81,12 @@ class ISBN(Base):
     publication_id: Mapped[int] = mapped_column(ForeignKey("Publication.id"))
     publisher_id: Mapped[int] = mapped_column(ForeignKey("PublishingHouses.id"))
 
+
 class Characteristics(Base):
     __tablename__ = "Characteristics"
-    publication_site_id: Mapped[int] = mapped_column(ForeignKey("PublicationSite.id"), primary_key=True)
+    publication_site_id: Mapped[int] = mapped_column(
+        ForeignKey("PublicationSite.id"), primary_key=True
+    )
 
     year: Mapped[int] = mapped_column(Integer)
     page_count: Mapped[int] = mapped_column(Integer)
@@ -91,9 +94,7 @@ class Characteristics(Base):
     dim_y: Mapped[Optional[int]] = mapped_column(Integer)
     dim_z: Mapped[Optional[int]] = mapped_column(Integer)
     cover_id: Mapped[int] = mapped_column(ForeignKey("CoveragesTypes.id"))
-    illustration_id: Mapped[int] = mapped_column(
-        ForeignKey("IllustrationTypes.id")
-    )
+    illustration_id: Mapped[int] = mapped_column(ForeignKey("IllustrationTypes.id"))
 
 
 class PublicationAuthors(Base):
@@ -149,7 +150,9 @@ class CharacteristicsAdditional(Base):
 class CharacteristicsGenre(Base):
     __tablename__ = "CharacteristicsGenre"
     characteristic_id: Mapped[int] = mapped_column(
-        ForeignKey("Characteristics.publication_site_id"), primary_key=True, nullable=False
+        ForeignKey("Characteristics.publication_site_id"),
+        primary_key=True,
+        nullable=False,
     )
     genre_id: Mapped[int] = mapped_column(
         ForeignKey("Genre.id"), primary_key=True, nullable=False

@@ -3,8 +3,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
-from settings import settings
 from handlers import api_router
+from settings import settings
 
 print(settings)
 

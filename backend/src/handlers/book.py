@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+
 from dependency import get_book_service
 from service.book import BookService
 
@@ -31,8 +32,5 @@ async def get_books(
     book_service: BookService = Depends(get_book_service),
 ):
     print(genre, author, year_from, year_to, limit, offset)
-    
-    
-    
-    
+
     return [genre, author, year_from, year_to, limit, offset]
