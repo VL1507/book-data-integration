@@ -27,7 +27,6 @@ services:
       VITE_BACKEND_URL: http://backend:8000
 
   my-mysql:
-    # build: ./my-mysql/
     image: mysql:8.0.16
     container_name: my-mysql
     environment:
@@ -79,7 +78,6 @@ services:
     depends_on:
       my-mysql:
         condition: service_healthy
-
 
 volumes:
   mysql_data:
