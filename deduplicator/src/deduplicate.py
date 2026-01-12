@@ -31,6 +31,10 @@ def union_group(session, group: list[int]):
             SET pa.publication_id = :pub_id
             WHERE pa.publication_id IN :ids
                 AND pa_special.authors_id IS NULL;
+        """
+    )
+    exceq_query(
+        """
             DELETE FROM PublicationAuthors WHERE PublicationAuthors.publication_id IN :ids;
         """
     )
