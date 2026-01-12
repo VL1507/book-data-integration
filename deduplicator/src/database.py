@@ -28,7 +28,7 @@ def process_books_name(session) -> bool:
     try:
         session.execute(text("""
                     ALTER TABLE Publication 
-                    ADD COLUMN IF NOT EXISTS metaphone VARCHAR(30) DEFAULT NULL
+                    ADD COLUMN IF NOT EXISTS metaphone VARCHAR(255) DEFAULT NULL
                 """))
         session.commit()
     except OperationalError as oe:
