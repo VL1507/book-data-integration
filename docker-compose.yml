@@ -4,6 +4,13 @@ services:
     build: ./backend/
     ports:
       - "8000:8000"
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ${DATA_MYSQL_PASSWORD}
+      DB_HOST: my-mysql
+      DB_PORT: 3306
+      DB_NAME: app
+      APP_PORT: 8000
 
   frontend:
     container_name: book-frontend
@@ -14,9 +21,9 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
-      - VITE_BACKEND_URL=http://backend:8000
+      CHOKIDAR_USEPOLLING: true
+      WATCHPACK_POLLING: true
+      VITE_BACKEND_URL: http://backend:8000
 
   my-mysql:
     build: ./my-mysql/
@@ -45,6 +52,31 @@ services:
     depends_on:
       my-mysql:
         condition: service_healthy
+
+  metaphone:
+    profiles: [ "deduplicator" ]
+    container_name: metaphone
+    build: ./deduplicator/
+    environment:
+      DATABASE_URL: mysql+pymysql://root:${DATA_MYSQL_PASSWORD}@my-mysql:3306/app
+      MODE: metaphone
+    depends_on:
+      my-mysql:
+        condition: service_healthy
+      clear:
+        condition: service_completed_successfully
+
+  clear:
+    profiles: [ "deduplicator" ]
+    container_name: clear
+    build: ./deduplicator/
+    environment:
+      DATABASE_URL: mysql+pymysql://root:${DATA_MYSQL_PASSWORD}@my-mysql:3306/app
+      MODE: clear
+    depends_on:
+      my-mysql:
+        condition: service_healthy
+
 
 volumes:
   mysql_data:

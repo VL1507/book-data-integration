@@ -78,8 +78,8 @@ class ISBN(Base):
     __tablename__ = "ISBN"
 
     isbn: Mapped[str] = mapped_column(String, primary_key=True)
-    publication_site_id: Mapped[int] = mapped_column(ForeignKey("PublicationSite.id"))
-    publisher_id: Mapped[id] = mapped_column(ForeignKey("PublishingHouses.id"))
+    publication_id: Mapped[int] = mapped_column(ForeignKey("Publication.id"))
+    publisher_id: Mapped[int] = mapped_column(ForeignKey("PublishingHouses.id"))
 
 class Characteristics(Base):
     __tablename__ = "Characteristics"
@@ -138,7 +138,7 @@ class CharacteristicsAdditional(Base):
     __tablename__ = "CharacteristicsAdditional"
 
     characteristic_id: Mapped[int] = mapped_column(
-        ForeignKey("Characteristics.publication_id"), primary_key=True
+        ForeignKey("Characteristics.publication_site_id"), primary_key=True
     )
     additional_id: Mapped[int] = mapped_column(
         ForeignKey("AdditionalCharacteristics.id"), primary_key=True

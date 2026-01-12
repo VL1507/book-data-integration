@@ -1,5 +1,8 @@
 import json
 from pathlib import Path
+import shutil
+import time
+import sys
 
 from sqlalchemy import select
 
@@ -44,6 +47,36 @@ def load_from_json(path: Path) -> list[BookSitesCrawlerItem]:
 
     return items
 
+class DataShow:
+    k = 5
+    def __init__(self, cnt: int):
+        self.start = time.perf_counter()
+        self.limit = cnt
+        self.cnt = 0
+        self.last = ['']*self.k
+    
+    def inc(self):
+        self.cnt += 1
+
+    def add(self, resp: str):
+        self.inc()
+        stamp = time.perf_counter()
+        self.last.append(f'Book {self.cnt}/{self.limit}: {resp}&{(stamp-self.start):.4f}s')
+        self.last = self.last[-self.k:]
+
+    def clear(self):
+        sys.stdout.write(f"\033[{self.k}A")
+        sys.stdout.write("\033[J")
+    
+    def reprint(self):
+        self.clear()
+        self.print()
+
+    def print(self):
+        width, _ = shutil.get_terminal_size()
+        parsed = [('.'*(width-len(x)+1)).join(x.split('&')) if len(x) > 0 else '.'*width for x in self.last]
+        sys.stdout.write("\n".join(parsed)+'\n')
+        sys.stdout.flush()
 
 @timer
 def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
@@ -56,7 +89,8 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
         genre_cache: dict[str, Genre] = {}
         coverages_types_cache: dict[str, CoveragesTypes] = {}
         illustration_types_cache: dict[str, IllustrationTypes] = {}
-
+        data_show = DataShow(len(book_items))
+        data_show.print()
         book_i = 0
         book_success = 0
         for book_item in book_items:
@@ -65,6 +99,8 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # Publication
             if book_item.books_name is None:
+                data_show.add("continue - book_item.books_name is None")
+                data_show.reprint()
                 logger.debug("continue - book_item.books_name is None")
                 continue
 
@@ -96,6 +132,8 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # Authors
             if len(book_item.authors_name) == 0:
+                data_show.add("continue - len(book_item.authors_name) == 0")
+                data_show.reprint()
                 logger.debug("continue - len(book_item.authors_name) == 0")
                 continue
 
@@ -149,6 +187,8 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # PublishingHouses
             if book_item.publishing_houses_name is None:
+                data_show.add("continue - book_item.publishing_houses_name is None")
+                data_show.reprint()
                 logger.debug("continue - book_item.publishing_houses_name is None")
                 continue
 
@@ -176,6 +216,8 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # ISBN
             if len(book_item.isbn) == 0:
+                data_show.add("continue - len(book_item.isbn) == 0")
+                data_show.reprint()
                 logger.debug("continue - len(book_item.isbn) == 0")
                 continue
 
@@ -210,6 +252,8 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # PublicationSite
             if book_item.publication_site_price is None:
+                data_show.add("continue - book_item.publication_site_price is None")
+                data_show.reprint()
                 logger.debug("continue - book_item.publication_site_price is None")
                 continue
 
@@ -292,9 +336,13 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # Characteristics
             if book_item.year is None:
+                data_show.add("continue - book_item.year is None")
+                data_show.reprint()
                 logger.debug("continue - book_item.year is None")
                 continue
             if book_item.page_count is None:
+                data_show.add("continue - book_item.page_count is None")
+                data_show.reprint()
                 logger.debug("continue - book_item.page_count is None")
                 continue
 
@@ -353,8 +401,10 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             session.commit()
             book_success += 1
+            data_show.inc()
         session.commit()
-
-        logger.info(
+        data_show.clear()
+        print(f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%")
+        logger.debug(
             f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%"
         )
