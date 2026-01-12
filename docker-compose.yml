@@ -5,12 +5,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DB_USER: root
-      DB_PASSWORD: ${DATA_MYSQL_PASSWORD}
-      DB_HOST: my-mysql
-      DB_PORT: 3306
-      DB_NAME: app
-      APP_PORT: 8000
+      DB__USER: root
+      DB__PASSWORD: ${DATA_MYSQL_PASSWORD}
+      DB__HOST: my-mysql
+      DB__PORT: 3306
+      DB__NAME: app
+      APP__PORT: 8000
+      APP__FRONTEND_URL: http://frontend:5173
 
   frontend:
     container_name: book-frontend
