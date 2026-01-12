@@ -39,50 +39,43 @@ class BookRepository:
         year_from: int | None = None,
         year_to: int | None = None,
     ):
-        pub_cte = (
-            select(
-                Publication.id.label("publication_id"),
-                Publication.name.label("title"),
-                func.aggregate_strings(Authors.name, ",").label("authors"),
-            )
-            .join(
-                PublicationAuthors, PublicationAuthors.publication_id == Publication.id
-            )
-            .join(Authors, Authors.id == PublicationAuthors.authors_id)
-            .group_by(Publication.id, Publication.name)
-            .cte("pub_cte")
-        )
-
         stmt = (
             select(
-                pub_cte.c.publication_id,
-                pub_cte.c.title,
-                pub_cte.c.authors,
-                PublicationSite.image_url,
-                Characteristics.year,
-                func.aggregate_strings(Genre.genre, ",").label("genres"),
+                Publication.id,
+                Publication.name,
+                func.min(PublicationSite.image_url).label("image_url"),
+                func.aggregate_strings(
+                    Characteristics.year.distinct(), separator=","
+                ).label("years"),
+                func.aggregate_strings(Authors.name.distinct(), separator=",").label(
+                    "authors"
+                ),
+                func.coalesce(
+                    func.aggregate_strings(Genre.genre.distinct(), separator=",").label(
+                        "genres"
+                    ),
+                    "",
+                ),
             )
-            .join(
-                PublicationSite,
-                PublicationSite.publication_id == pub_cte.c.publication_id,
+            .outerjoin(
+                PublicationAuthors, PublicationAuthors.publication_id == Publication.id
             )
-            .join(
+            .outerjoin(Authors, Authors.id == PublicationAuthors.authors_id)
+            .outerjoin(
+                PublicationSite, PublicationSite.publication_id == Publication.id
+            )
+            .outerjoin(
                 Characteristics,
                 Characteristics.publication_site_id == PublicationSite.id,
             )
-            .join(
+            .outerjoin(
                 CharacteristicsGenre,
                 CharacteristicsGenre.characteristic_id
                 == Characteristics.publication_site_id,
             )
-            .join(Genre, Genre.id == CharacteristicsGenre.genre_id)
-            .group_by(
-                pub_cte.c.publication_id,
-                pub_cte.c.title,
-                pub_cte.c.authors,
-                PublicationSite.image_url,
-                Characteristics.year,
-            )
+            .outerjoin(Genre, Genre.id == CharacteristicsGenre.genre_id)
+            .group_by(Publication.id)
+            .order_by(Publication.id)
             .limit(limit=limit)
             .offset(offset=offset)
         )

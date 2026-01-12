@@ -5,7 +5,7 @@ class BookForListSchema(BaseModel):
     publication_id: int
     title: str
     authors: list[str]
-    year: list[int]
+    years: list[int]
     genres: list[str]
     image_url: str
 
