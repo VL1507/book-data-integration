@@ -25,7 +25,7 @@ def union_group(session, group: list[int]):
     exceq_query(
         """
             UPDATE PublicationAuthors pa
-            LEFT JOIN PublicationAuthors pa_special ON 
+            LEFT OUTER JOIN PublicationAuthors pa_special ON 
                 pa_special.publication_id = :pub_id AND 
                 pa_special.authors_id = pa.authors_id
             SET pa.publication_id = :pub_id
