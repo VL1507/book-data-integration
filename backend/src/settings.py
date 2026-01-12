@@ -14,11 +14,17 @@ class DB(BaseModel):
         return f"mysql+pymysql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
 
 
+class APP(BaseModel):
+    PORT: int
+    FRONTEND_URL: str
+
+
 class Settings(BaseSettings):
     DB: DB
+    APP: APP
 
     model_config = SettingsConfigDict(
-        env_nested_delimiter="_",
+        env_nested_delimiter="__",
         extra="ignore",
     )
 
