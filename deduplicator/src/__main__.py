@@ -6,7 +6,8 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database import process_books_name
+from deduplicator.src.metaphone import process_books_metaphone
+from deduplicator.src.clear import process_books_name
 
 
 def get_engine(db_retry_attempts=5, db_retry_delay=10):
@@ -30,7 +31,14 @@ def initialize_database():
     SessionFactory = sessionmaker(bind=engine)
     return SessionFactory()
 
-def mataphone(session):
+def metaphone(session):
+    if process_books_metaphone(session):
+        print("Program finished successfully")
+    else:
+        print("Program crashed with error")
+        sys.exit(1)
+
+def clear(session):
     if process_books_name(session):
         print("Program finished successfully")
     else:
@@ -41,7 +49,9 @@ def main():
     session = initialize_database()
     mode = os.getenv('MODE')
     if mode == 'metaphone':
-        mataphone(session)
+        metaphone(session)
+    if mode == 'clear':
+        clear(session)
 
 
 if __name__ == "__main__":
