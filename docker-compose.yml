@@ -10,6 +10,7 @@ services:
       DB_HOST: my-mysql
       DB_PORT: 3306
       DB_NAME: app
+      APP_PORT: 8000
 
   frontend:
     container_name: book-frontend
