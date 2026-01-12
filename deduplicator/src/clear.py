@@ -19,7 +19,7 @@ def process_word(word):
     word = re.sub(r'#[^ ]*', '', word)
     word = re.sub(r'\+[^$]*', '', word)
     for b in bad_words:
-        pattern = f'[А-яA-z]{b}[А-яA-z]'
+        pattern = f'(?<![А-яA-z]){b}(?![А-яA-z])'
         word = re.sub(pattern, '', word)
     while '..' in word or '  ' in word or ' .' in word:
         word = re.sub(r'\s{2,}', ' ', word)
