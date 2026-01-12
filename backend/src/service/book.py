@@ -36,8 +36,9 @@ class BookService:
             BookForListSchema(
                 publication_id=row[0],
                 title=row[1],
-                authors=row[3].split(","),
-                image_url=row[4],
+                authors=row[2].split(","),
+                image_url=row[3],
+                year=row[4],
                 genres=row[5].split(","),
             )
             for row in result
