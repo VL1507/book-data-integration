@@ -107,12 +107,43 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             logger.debug(book_i)
             book_i += 1
 
-            # Publication
+            # Проверка
             if book_item.books_name is None:
                 data_show.add("continue - book_item.books_name is None")
                 data_show.reprint()
                 logger.debug("continue - book_item.books_name is None")
                 continue
+            if len(book_item.authors_name) == 0:
+                data_show.add("continue - len(book_item.authors_name) == 0")
+                data_show.reprint()
+                logger.debug("continue - len(book_item.authors_name) == 0")
+                continue
+            if book_item.publishing_houses_name is None:
+                data_show.add("continue - book_item.publishing_houses_name is None")
+                data_show.reprint()
+                logger.debug("continue - book_item.publishing_houses_name is None")
+                continue
+            if len(book_item.isbn) == 0:
+                data_show.add("continue - len(book_item.isbn) == 0")
+                data_show.reprint()
+                logger.debug("continue - len(book_item.isbn) == 0")
+                continue
+            if book_item.publication_site_price is None:
+                data_show.add("continue - book_item.publication_site_price is None")
+                data_show.reprint()
+                logger.debug("continue - book_item.publication_site_price is None")
+                continue
+            if book_item.year is None:
+                data_show.add("continue - book_item.year is None")
+                data_show.reprint()
+                logger.debug("continue - book_item.year is None")
+                continue
+            if book_item.page_count is None:
+                data_show.add("continue - book_item.page_count is None")
+                data_show.reprint()
+                logger.debug("continue - book_item.page_count is None")
+                continue
+            # Publication
 
             publication_key = book_item.books_name
             publication = publication_cache.get(publication_key)
@@ -141,11 +172,6 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             session.flush()
 
             # Authors
-            if len(book_item.authors_name) == 0:
-                data_show.add("continue - len(book_item.authors_name) == 0")
-                data_show.reprint()
-                logger.debug("continue - len(book_item.authors_name) == 0")
-                continue
 
             for author_name in book_item.authors_name:
                 author_key = author_name
@@ -196,11 +222,6 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             session.flush()
 
             # PublishingHouses
-            if book_item.publishing_houses_name is None:
-                data_show.add("continue - book_item.publishing_houses_name is None")
-                data_show.reprint()
-                logger.debug("continue - book_item.publishing_houses_name is None")
-                continue
 
             publishing_house_key = (
                 book_item.publishing_houses_name,
@@ -225,11 +246,6 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             session.flush()
 
             # ISBN
-            if len(book_item.isbn) == 0:
-                data_show.add("continue - len(book_item.isbn) == 0")
-                data_show.reprint()
-                logger.debug("continue - len(book_item.isbn) == 0")
-                continue
 
             for book_isbn in book_item.isbn:
                 isbn = session.scalar(select(ISBN).where(ISBN.isbn == book_isbn))
@@ -261,11 +277,6 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             session.flush()
 
             # PublicationSite
-            if book_item.publication_site_price is None:
-                data_show.add("continue - book_item.publication_site_price is None")
-                data_show.reprint()
-                logger.debug("continue - book_item.publication_site_price is None")
-                continue
 
             publication_site = PublicationSite(
                 publication_id=publication.id,
@@ -345,16 +356,6 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             # AdditionalCharacteristics
 
             # Characteristics
-            if book_item.year is None:
-                data_show.add("continue - book_item.year is None")
-                data_show.reprint()
-                logger.debug("continue - book_item.year is None")
-                continue
-            if book_item.page_count is None:
-                data_show.add("continue - book_item.page_count is None")
-                data_show.reprint()
-                logger.debug("continue - book_item.page_count is None")
-                continue
 
             characteristics = Characteristics(
                 publication_site_id=publication_site.id,
