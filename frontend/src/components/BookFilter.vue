@@ -32,16 +32,18 @@
       </div>
 
       <div class="filter-group">
-        <label>Год от</label>
-        <input
-          v-model="localFilters.year_from"
-          type="number"
-          placeholder="От"
-          @keyup.enter="applyFilters"
-        />
+        <label>Год</label>
+        <div class="slider-cont">
+          <h3>Slider 3: {{ sliderMin }} - {{ sliderMax }}</h3>
+          <CustomMinMaxSlider
+            :max="2000"
+            v-model:min-value="sliderMin"
+            v-model:max-value="sliderMax"
+          />
+        </div>
       </div>
 
-      <div class="filter-group">
+      <!-- <div class="filter-group">
         <label>Год до</label>
         <input
           v-model="localFilters.year_to"
@@ -49,7 +51,7 @@
           placeholder="До"
           @keyup.enter="applyFilters"
         />
-      </div>
+      </div> -->
     </div>
 
     <div class="active-filters" v-if="hasActiveFilters">
@@ -76,9 +78,18 @@
   </div>
 </template>
 
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, watchEffect } from 'vue'
 import type { BookFilters } from '@/types/book'
+import CustomMinMaxSlider from "./CustomMinMaxSlider.vue";
+
+const sliderMin = ref(50);
+const sliderMax = ref(80);
+
 
 interface Props {
   filters: BookFilters
@@ -103,20 +114,23 @@ const hasActiveFilters = computed(() => {
 })
 
 const applyFilters = () => {
-  // Очищаем пустые значения перед отправкой
-  const cleanedFilters: BookFilters = {}
+  console.log(localFilters.value.year_from)
+  console.log(localFilters.value.year_to)
 
-  Object.entries(localFilters.value).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
-      cleanedFilters[key as keyof BookFilters] = value
-    }
-  })
+  // // Очищаем пустые значения перед отправкой
+  // const cleanedFilters: BookFilters = {}
 
-  cleanedFilters.offset = 0 // Сбрасываем пагинацию при новом поиске
-  cleanedFilters.limit = props.filters.limit || 6
+  // Object.entries(localFilters.value).forEach(([key, value]) => {
+  //   if (value !== undefined && value !== null && value !== '') {
+  //     cleanedFilters[key as keyof BookFilters] = value
+  //   }
+  // })
 
-  emit('update:filters', cleanedFilters)
-  emit('apply')
+  // cleanedFilters.offset = 0 // Сбрасываем пагинацию при новом поиске
+  // cleanedFilters.limit = props.filters.limit || 6
+
+  // emit('update:filters', cleanedFilters)
+  // emit('apply')
 }
 
 const resetFilters = () => {
@@ -139,6 +153,10 @@ watch(
   { deep: true },
 )
 </script>
+
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 
 <style scoped>
 .book-filter {
@@ -168,6 +186,7 @@ watch(
   display: flex;
   gap: 0.5rem;
 }
+
 
 .apply-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

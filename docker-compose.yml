@@ -64,6 +64,8 @@ services:
     depends_on:
       my-mysql:
         condition: service_healthy
+      clear:
+        condition: service_completed_successfully
 
   clear:
     profiles: [ "deduplicator" ]

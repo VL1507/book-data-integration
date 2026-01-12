@@ -8,9 +8,9 @@ importers:
 
   .:
     dependencies:
-      '@vueform/slider':
-        specifier: ^2.1.10
-        version: 2.1.10
+      '@coreui/vue':
+        specifier: ^5.7.0
+        version: 5.7.0(vue@3.5.24(typescript@5.9.3))
       axios:
         specifier: ^1.13.2
         version: 1.13.2
@@ -211,6 +211,16 @@ packages:
   '@babel/types@7.28.5':
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
     engines: {node: '>=6.9.0'}
+
+  '@coreui/coreui@5.5.0':
+    resolution: {integrity: sha512-ut0LHYck+VHl+sKExaClr3NXl94ihyjUra01ybaPS9YMBVD5IT0lhV4pPBjPyi9xoxL/wBOVc5zzOSliCxBEGw==}
+    peerDependencies:
+      '@popperjs/core': ^2.11.8
+
+  '@coreui/vue@5.7.0':
+    resolution: {integrity: sha512-YVwVk5A/87f0SgGhpwNdX87Tm1r1Ti2Ygh0QV6bBhjMntsWZZyHs24fCC2QneiZ5IQK0Dq1JsHcfCCJtzv2IXg==}
+    peerDependencies:
+      vue: ^3.5.0
 
   '@esbuild/aix-ppc64@0.25.12':
     resolution: {integrity: sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA==}
@@ -456,6 +466,9 @@ packages:
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
+
+  '@popperjs/core@2.11.8':
+    resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
   '@rolldown/pluginutils@1.0.0-beta.29':
     resolution: {integrity: sha512-NIJgOsMjbxAXvoGq/X0gD7VPMQ8j9g0BiDaNjVNVjvl+iKXxL3Jre0v31RmBYeLEmkbj2s02v8vFTbUXi5XS2Q==}
@@ -760,9 +773,6 @@ packages:
         optional: true
       vue:
         optional: true
-
-  '@vueform/slider@2.1.10':
-    resolution: {integrity: sha512-L2G3Ju51Yq6yWF2wzYYsicUUaH56kL1QKGVtimUVHT1K1ADcRT94xVyIeJpS0klliVEeF6iMZFbdXtHq8AsDHw==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -1148,6 +1158,9 @@ packages:
 
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
+
+  html-entities@2.6.0:
+    resolution: {integrity: sha512-kig+rMn/QOVRvr7c86gQ8lWXq+Hkv6CbAH1hLu+RG338StTpE8Z0b44SDVaqVu7HGKf27frdmUYEs9hTUX/cLQ==}
 
   ignore@5.3.2:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
@@ -1880,6 +1893,17 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
+  '@coreui/coreui@5.5.0(@popperjs/core@2.11.8)':
+    dependencies:
+      '@popperjs/core': 2.11.8
+      html-entities: 2.6.0
+
+  '@coreui/vue@5.7.0(vue@3.5.24(typescript@5.9.3))':
+    dependencies:
+      '@coreui/coreui': 5.5.0(@popperjs/core@2.11.8)
+      '@popperjs/core': 2.11.8
+      vue: 3.5.24(typescript@5.9.3)
+
   '@esbuild/aix-ppc64@0.25.12':
     optional: true
 
@@ -2049,6 +2073,8 @@ snapshots:
   '@pkgr/core@0.2.9': {}
 
   '@polka/url@1.0.0-next.29': {}
+
+  '@popperjs/core@2.11.8': {}
 
   '@rolldown/pluginutils@1.0.0-beta.29': {}
 
@@ -2406,8 +2432,6 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
       vue: 3.5.24(typescript@5.9.3)
-
-  '@vueform/slider@2.1.10': {}
 
   acorn-jsx@5.3.2(acorn@8.15.0):
     dependencies:
@@ -2798,6 +2822,8 @@ snapshots:
       function-bind: 1.1.2
 
   hookable@5.5.3: {}
+
+  html-entities@2.6.0: {}
 
   ignore@5.3.2: {}
 
