@@ -22,7 +22,7 @@ def process_word(word):
         word = word.replace(b, '')
     while '..' in word or '  ' in word:
         word = re.sub(r'\s+', ' ', word)
-        word = re.sub(r'(.)+', '.', word)
+        word = word.replace('..', '.')
     word = word.strip(' .,|:;')
     return word
 
