@@ -50,7 +50,7 @@ def process_books_name(session) -> bool:
         print(f"Error: {oe}")
         return False
 
-    batch_size = int(len(result)**0.5)
+    batch_size = int(len(rows)**0.5)
 
     for t, id, name in tqdm(enumerate(rows)):
         try:
