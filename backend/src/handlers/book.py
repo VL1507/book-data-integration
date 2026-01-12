@@ -5,6 +5,18 @@ from pydantic import BaseModel
 router = APIRouter(prefix="/books")
 
 
+@router.get("/{isbn:str}")
+async def get_book_by_isbn(isbn: str):
+    print(isbn)
+    return isbn
+
+
+@router.get("/")
+async def get_books():
+    print(get_books)
+    return
+
+
 # @app.get("/{book_id}", response_model=Book)
 # async def get_book(book_id: int):
 #     """Получить информацию о книге по её ID"""
