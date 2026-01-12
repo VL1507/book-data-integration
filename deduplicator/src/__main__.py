@@ -6,8 +6,8 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from deduplicator.src.metaphone import process_books_metaphone
-from deduplicator.src.clear import process_books_name
+from metaphone import process_books_metaphone
+from clear import process_books_name
 
 
 def get_engine(db_retry_attempts=5, db_retry_delay=10):
