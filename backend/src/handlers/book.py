@@ -31,8 +31,6 @@ async def get_books(
     offset: int = Query(0, description="Смещение", ge=0),
     book_service: BookService = Depends(get_book_service),
 ):
-    # print(genre, author, year_from, year_to, limit, offset)
-
     books = await book_service.get_books(
         limit=limit,
         offset=offset,

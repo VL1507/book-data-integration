@@ -89,8 +89,6 @@ class BookRepository:
 
         result = await self.__db_session.execute(statement=stmt)
 
-        books = result.all()
-
-        print(books)
+        books = list(result.all())
 
         return books
