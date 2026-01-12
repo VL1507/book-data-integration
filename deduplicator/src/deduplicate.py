@@ -1,6 +1,6 @@
 import re
 
-from sqlalchemy import text
+from sqlalchemy import text, bindparam
 from sqlalchemy.exc import OperationalError
 from tqdm import tqdm
 
@@ -9,70 +9,58 @@ def union_group(session, group: list[int]):
     if len(group) <= 1:
         return
     
-    params = {f"id{i}": id_val for i, id_val in enumerate(group[1:])}
-    params['pub_id'] = group[0]
-    placeholders = ", ".join([f":id{i}" for i in range(len(group[1:]))])
-    
+    def exceq_query(query):
+        query = text(query).bindparams(
+            bindparam('pub_id', value=group[0]),
+            bindparam('ids', value=group[1:], expanding=True)
+        )
+        try:
+            session.execute(query)
+        except OperationalError as oe:
+            session.rollback()
+            print(f"Error: {oe}")
+            return False
+
     ## Добавление новых авторов и удаление у старых
-    try:
-        result = session.execute(text(f"""
-                                UPDATE PublicationAuthors pa
-                                LEFT JOIN PublicationAuthors pa_special ON 
-                                    pa_special.publication_id = :pub_id AND 
-                                    pa_special.authors_id = pa.authors_id
-                                SET pa.publication_id = :pub_id
-                                WHERE pa.publication_id IN ({placeholders})
-                                AND pa_special.authors_id IS NULL;
-                                DELETE FROM PublicationAuthors WHERE PublicationAuthors.publication_id IN ({placeholders});
-                            """), 
-                            params
-                            )
-    except OperationalError as oe:
-        session.rollback()
-        print(f"Error: {oe}")
-        return False
+    exceq_query(
+        """
+            UPDATE PublicationAuthors pa
+            LEFT JOIN PublicationAuthors pa_special ON 
+                pa_special.publication_id = :pub_id AND 
+                pa_special.authors_id = pa.authors_id
+            SET pa.publication_id = :pub_id
+            WHERE pa.publication_id IN :ids
+                AND pa_special.authors_id IS NULL;
+            DELETE FROM PublicationAuthors WHERE PublicationAuthors.publication_id IN :ids;
+        """
+    )
     
-    ## Изменение привязки рецензий
-    try:
-        result = session.execute(text(f"""
-                                UPDATE Recension
-                                SET publication_id = :pub_id
-                                WHERE publication_id IN ({placeholders});
-                            """), 
-                            params
-                            )
-    except OperationalError as oe:
-        session.rollback()
-        print(f"Error: {oe}")
-        return False
+    ## Изменение привязки Recension
+    exceq_query(
+        """
+            UPDATE Recension
+            SET publication_id = :pub_id
+            WHERE publication_id IN :ids;
+        """
+    )
 
     ## Изменение привязки ISBN
-    try:
-        result = session.execute(text(f"""
-                                UPDATE ISBN
-                                SET publication_id = :pub_id
-                                WHERE publication_id IN ({placeholders});
-                            """), 
-                            params
-                            )
-    except OperationalError as oe:
-        session.rollback()
-        print(f"Error: {oe}")
-        return False
+    exceq_query(
+        """
+            UPDATE ISBN
+            SET publication_id = :pub_id
+            WHERE publication_id IN :ids;
+        """
+    )
 
     ## Изменение привязки PublicationSite
-    try:
-        result = session.execute(text(f"""
-                                UPDATE PublicationSite
-                                SET publication_id = :pub_id
-                                WHERE publication_id IN ({placeholders});
-                            """), 
-                            params
-                            )
-    except OperationalError as oe:
-        session.rollback()
-        print(f"Error: {oe}")
-        return False
+    exceq_query(
+        """
+            UPDATE PublicationSite
+            SET publication_id = :pub_id
+            WHERE publication_id IN :ids;
+        """
+    )
 
 
 def process_books_groups(session) -> bool:
