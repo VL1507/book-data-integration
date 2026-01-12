@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-
+from sqlalchemy import select, func
+from sqlalchemy.orm import aliased
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import (
@@ -39,4 +39,58 @@ class BookRepository:
         year_from: int | None = None,
         year_to: int | None = None,
     ):
-        pass
+        pub_cte = (
+            select(
+                Publication.id.label("publication_id"),
+                Publication.name.label("title"),
+                func.aggregate_strings(Authors.name, ",").label("authors"),
+            )
+            .join(
+                PublicationAuthors, PublicationAuthors.publication_id == Publication.id
+            )
+            .join(Authors, Authors.id == PublicationAuthors.authors_id)
+            .group_by(Publication.id, Publication.name)
+            .cte("pub_cte")
+        )
+
+        stmt = (
+            select(
+                pub_cte.c.publication_id,
+                pub_cte.c.title,
+                pub_cte.c.authors,
+                PublicationSite.image_url,
+                Characteristics.year,
+                func.aggregate_strings(Genre.genre, ",").label("genres"),
+            )
+            .join(
+                PublicationSite,
+                PublicationSite.publication_id == pub_cte.c.publication_id,
+            )
+            .join(
+                Characteristics,
+                Characteristics.publication_site_id == PublicationSite.id,
+            )
+            .join(
+                CharacteristicsGenre,
+                CharacteristicsGenre.characteristic_id
+                == Characteristics.publication_site_id,
+            )
+            .join(Genre, Genre.id == CharacteristicsGenre.genre_id)
+            .group_by(
+                pub_cte.c.publication_id,
+                pub_cte.c.title,
+                pub_cte.c.authors,
+                PublicationSite.image_url,
+                Characteristics.year,
+            )
+            .limit(limit=limit)
+            .offset(offset=offset)
+        )
+
+        result = await self.__db_session.execute(statement=stmt)
+
+        books = result.all()
+
+        print(books)
+
+        return books

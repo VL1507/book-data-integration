@@ -24,6 +24,14 @@ class BookService:
         year_from: int | None = None,
         year_to: int | None = None,
     ) -> list[BookForListSchema]:
-        result = await self.__book_repository.get_books()
+        result = await self.__book_repository.get_books(
+            limit=limit,
+            offset=offset,
+            genre=genre,
+            author=author,
+            year_from=year_from,
+            year_to=year_to,
+        )
+        print(f"{list(result) = }")
         books: list[BookForListSchema] = []
         return books
