@@ -16,7 +16,7 @@ def process_phonetic(word):
     word = re.sub(r'[^А-я0-9\s]', '', word)
     word = re.sub(r'\s+', ' ', word)
     word = word.strip()
-    return RussianMetaphone(reduce_word=False, reduce_phonemes=True, reduce_vowels=True).transform(word)
+    return RussianMetaphone(reduce_word=False, reduce_phonemes=True, reduce_vowels=False).transform(word)
 
 def column_exists(session, table_name, column_name):
     """Проверяет, существует ли колонка в таблице"""
