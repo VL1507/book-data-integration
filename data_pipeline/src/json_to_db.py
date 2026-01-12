@@ -47,36 +47,46 @@ def load_from_json(path: Path) -> list[BookSitesCrawlerItem]:
 
     return items
 
+
 class DataShow:
     k = 5
+
     def __init__(self, cnt: int):
         self.start = time.perf_counter()
         self.limit = cnt
         self.cnt = 0
-        self.last = ['']*self.k
-    
+        self.last = [""] * self.k
+
     def inc(self):
         self.cnt += 1
 
     def add(self, resp: str):
         self.inc()
         stamp = time.perf_counter()
-        self.last.append(f'Book {self.cnt}/{self.limit}: {resp}&{(stamp-self.start):.4f}s')
-        self.last = self.last[-self.k:]
+        self.last.append(
+            f"Book {self.cnt}/{self.limit}: {resp}&{(stamp - self.start):.4f}s"
+        )
+        self.last = self.last[-self.k :]
 
     def clear(self):
         sys.stdout.write(f"\033[{self.k}A")
         sys.stdout.write("\033[J")
-    
+
     def reprint(self):
         self.clear()
         self.print()
 
     def print(self):
         width, _ = shutil.get_terminal_size()
-        parsed = [('.'*(width-len(x)+1)).join(x.split('&')) if len(x) > 0 else '.'*width for x in self.last]
-        sys.stdout.write("\n".join(parsed)+'\n')
+        parsed = [
+            ("." * (width - len(x) + 1)).join(x.split("&"))
+            if len(x) > 0
+            else "." * width
+            for x in self.last
+        ]
+        sys.stdout.write("\n".join(parsed) + "\n")
         sys.stdout.flush()
+
 
 @timer
 def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
@@ -404,7 +414,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             data_show.inc()
         session.commit()
         data_show.clear()
-        print(f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%")
+        print(
+            f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%"
+        )
         logger.debug(
             f"Успешно загружено {book_success} из {book_i} | {book_success / book_i * 100:.2f}%"
         )
