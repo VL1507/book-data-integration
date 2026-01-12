@@ -24,7 +24,7 @@ def column_exists(session, table_name, column_name):
     columns = inspector.get_columns(table_name)
     return any(col['name'] == column_name for col in columns)
 
-def process_books_name(session) -> bool:
+def process_books_metaphone(session) -> bool:
     '''
     Функция преобразования названия книг в их метафоны с использованием библиотеки fonetika
     :param session: SQLAlchemy активная сессия базы данных
