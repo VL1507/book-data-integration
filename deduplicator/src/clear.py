@@ -21,9 +21,9 @@ def process_word(word):
     for b in bad_words:
         word = word.replace(b, '')
     while '..' in word or '  ' in word:
-        word = re.sub(r'\s+', ' ', word)
-        word = word.replace('..', '.')
-    word = word.strip(' .,|:;')
+        word = re.sub(r'\s{2,}', ' ', word)
+        word = re.sub(r'(\s\.)|(\.{2,})', '.', word)
+    word = word.strip(' .,|:;-')
     return word
 
 
