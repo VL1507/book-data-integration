@@ -33,7 +33,7 @@ async def health_check():
 
 @app.get("/ping")
 async def ping_pong():
-    return {"message": "pong."}
+    return {"ping": "pong!"}
 
 
 if __name__ == "__main__":
