@@ -6,17 +6,17 @@ from service.book import BookService
 router = APIRouter(prefix="/books")
 
 
-@router.get("/{isbn:str}")
-async def get_book_by_isbn(
-    isbn: str,
+@router.get("/{publication_id:int}")
+async def get_book_by_publication_id(
+    publication_id: str,
     book_service: BookService = Depends(get_book_service),
 ):
-    print(isbn)
-    book = await book_service.get_book_by_isbn(isbn=isbn)
+    print(publication_id)
+    book = await book_service.get_book_by_publication_id(publication_id=publication_id)
     if book is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Book with isbn {isbn} not found",
+            detail="Book not found",
         )
     return book
 
