@@ -33,12 +33,20 @@ def union_group(session, group: list[int]):
                 AND pa_special.authors_id IS NULL;
         """
     )
-    exceq_query(
+    query = text(
         """
             DELETE FROM PublicationAuthors WHERE PublicationAuthors.publication_id IN :ids;
         """
-    )
-    
+    ).bindparams(
+            bindparam('ids', value=group[1:], expanding=True)
+        )
+    try:
+        session.execute(query)
+    except OperationalError as oe:
+        session.rollback()
+        print(f"Error: {oe}")
+        return False
+
     ## Изменение привязки Recension
     exceq_query(
         """
