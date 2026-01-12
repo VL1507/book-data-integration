@@ -1,7 +1,7 @@
 services:
   backend:
     profiles: [ "site" ]
-    container_name: book-backend
+    container_name: backend
     build: ./backend/
     ports:
       - "8000:8000"
@@ -19,7 +19,7 @@ services:
 
   frontend:
     profiles: [ "site" ]
-    container_name: book-frontend
+    container_name: frontend
     build: ./frontend/
     ports:
       - "5173:5173"
