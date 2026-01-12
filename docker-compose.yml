@@ -4,6 +4,12 @@ services:
     build: ./backend/
     ports:
       - "8000:8000"
+    environment:
+      DB_USER: root
+      DB_PASSWORD: ${DATA_MYSQL_PASSWORD}
+      DB_HOST: my-mysql
+      DB_PORT: 3306
+      DB_NAME: app
 
   frontend:
     container_name: book-frontend
@@ -45,7 +51,7 @@ services:
     depends_on:
       my-mysql:
         condition: service_healthy
-  
+
   deduplicator:
     profiles: [ "deduplicator" ]
     container_name: deduplicator
