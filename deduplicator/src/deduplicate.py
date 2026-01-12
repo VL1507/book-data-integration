@@ -104,7 +104,7 @@ def process_books_groups(session) -> bool:
         print(f"Error: {oe}")
         return False
 
-    groups = [list(map(int, x.split(','))) for x in groups]
+    groups = [list(map(int, x[0].split(','))) for x in groups]
 
     for t, group in tqdm(enumerate(groups)):
         union_group(session, group)
