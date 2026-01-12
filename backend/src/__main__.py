@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
 from settings import settings
+from handlers import api_router
 
 print(settings)
 
@@ -20,20 +21,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(api_router)
+
 
 @app.get("/")
 async def root():
     return RedirectResponse(url="/docs")
-
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "message": "API is working"}
-
-
-@app.get("/ping")
-async def ping_pong():
-    return {"message": "pong."}
 
 
 if __name__ == "__main__":

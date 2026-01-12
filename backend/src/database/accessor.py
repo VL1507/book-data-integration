@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from settings import settings
 
 engine = create_async_engine(
-    settings.DB.URL,
+    url=settings.DB.URL,
     echo=True,
 )
 
@@ -14,6 +14,6 @@ AsyncSessionFactory = async_sessionmaker(
 )
 
 
-async def get_db_session() -> AsyncSession:
+async def get_db_session():
     async with AsyncSessionFactory() as session:
         yield session
