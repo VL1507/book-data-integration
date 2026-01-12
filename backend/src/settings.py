@@ -11,7 +11,7 @@ class DB(BaseModel):
 
     @computed_field
     def URL(self) -> str:
-        return f"mysql+pymysql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
+        return f"mysql+aiomysql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
 
 
 class APP(BaseModel):
