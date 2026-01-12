@@ -6,7 +6,7 @@ from settings import settings
 
 engine = create_async_engine(
     url=settings.DB.URL,
-    echo=True,
+    echo=False,
 )
 
 AsyncSessionFactory = async_sessionmaker(
