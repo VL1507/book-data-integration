@@ -113,7 +113,7 @@ class Book24Spider(Spider):
             dim_z = dim_split[2]
             if dim_z is not None and dim_z.isdigit():
                 dim_z = int(dim_z)
-                
+
             item["dim_x"] = dim_x
             item["dim_y"] = dim_y
             item["dim_z"] = dim_z
