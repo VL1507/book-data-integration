@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from metaphone import process_books_metaphone
 from clear import process_books_name
+from deduplicate import process_books_groups
 
 
 def get_engine(db_retry_attempts=5, db_retry_delay=10):
@@ -45,6 +46,13 @@ def clear(session):
         print("Program crashed with error")
         sys.exit(1)
 
+def deduplicate(session):
+    if process_books_groups(session):
+        print("Program finished successfully")
+    else:
+        print("Program crashed with error")
+        sys.exit(1)
+
 def main():
     session = initialize_database()
     mode = os.getenv('MODE')
@@ -52,6 +60,8 @@ def main():
         metaphone(session)
     if mode == 'clear':
         clear(session)
+    if mode == 'deduplicate':
+        deduplicate(session)
 
 
 if __name__ == "__main__":
