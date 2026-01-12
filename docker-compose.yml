@@ -1,5 +1,6 @@
 services:
   backend:
+    profiles: [ "site" ]
     container_name: book-backend
     build: ./backend/
     ports:
@@ -14,6 +15,7 @@ services:
       APP__FRONTEND_URL: http://frontend:5173
 
   frontend:
+    profiles: [ "site" ]
     container_name: book-frontend
     build: ./frontend/
     ports:
@@ -44,10 +46,10 @@ services:
       interval: 10s
       start_period: 40s
 
-  data-pipeline:
-    profiles: [ "data-pipeline" ]
-    container_name: data-pipeline
-    build: ./data_pipeline/
+  data-loader:
+    profiles: [ "data-loader" ]
+    container_name: data-loader
+    build: ./data-loader/
     environment:
       DATABASE_URL: mysql+pymysql://root:${DATA_MYSQL_PASSWORD}@my-mysql:3306/app
       LOGGING_LEVEL: INFO
