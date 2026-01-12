@@ -8,11 +8,11 @@ from tqdm import tqdm
 def union_group(session, group: list[int]):
     if len(group) <= 1:
         return
-    
-    def exceq_query(query):
+    pub_id = bindparam('pub_id', value=group[0])
+    ids = bindparam('ids', value=group[1:], expanding=True)
+    def exceq_query(query, binds = [pub_id, ids]):
         query = text(query).bindparams(
-            bindparam('pub_id', value=group[0]),
-            bindparam('ids', value=group[1:], expanding=True)
+            *binds
         )
         try:
             session.execute(query)
@@ -33,19 +33,12 @@ def union_group(session, group: list[int]):
                 AND pa_special.authors_id IS NULL;
         """
     )
-    query = text(
+    exceq_query(
         """
             DELETE FROM PublicationAuthors WHERE PublicationAuthors.publication_id IN :ids;
-        """
-    ).bindparams(
-            bindparam('ids', value=group[1:], expanding=True)
-        )
-    try:
-        session.execute(query)
-    except OperationalError as oe:
-        session.rollback()
-        print(f"Error: {oe}")
-        return False
+        """,
+        [ids]
+    )
 
     ## Изменение привязки Recension
     exceq_query(
@@ -72,6 +65,14 @@ def union_group(session, group: list[int]):
             SET publication_id = :pub_id
             WHERE publication_id IN :ids;
         """
+    )
+
+    ## Удаление дублирующихся Publication
+    exceq_query(
+        """
+            DELETE FROM Publication WHERE Publication.id IN :ids;
+        """,
+        [ids]
     )
 
 
