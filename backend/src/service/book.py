@@ -37,7 +37,7 @@ class BookService:
                 publication_id=row[0],
                 title=row[1],
                 image_url=row[2],
-                years=row[3],
+                years=list(map(int, row[3].split(","))),
                 authors=row[4].split(","),
                 genres=row[5].split(","),
             )
