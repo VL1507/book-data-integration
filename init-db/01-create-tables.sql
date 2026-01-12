@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS ISBN (
 );
 
 CREATE TABLE IF NOT EXISTS Characteristics (
-	publication_site_id INTEGER PRIMARY KEY AUTO_INCREMENT,
+	publication_site_id INTEGER PRIMARY KEY,
 	year INTEGER NOT NULL,
 	page_count INTEGER NOT NULL,
 	dim_x INTEGER,
