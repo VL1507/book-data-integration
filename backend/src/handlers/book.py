@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from dependency import get_book_service
 from service.book import BookService
 
@@ -12,6 +12,11 @@ async def get_book_by_isbn(
 ):
     print(isbn)
     book = await book_service.get_book_by_isbn(isbn=isbn)
+    if book is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Book with isbn {isbn} not found",
+        )
     return book
 
 
@@ -26,4 +31,8 @@ async def get_books(
     book_service: BookService = Depends(get_book_service),
 ):
     print(genre, author, year_from, year_to, limit, offset)
+    
+    
+    
+    
     return [genre, author, year_from, year_to, limit, offset]
