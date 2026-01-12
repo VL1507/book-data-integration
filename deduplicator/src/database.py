@@ -52,15 +52,16 @@ def process_books_name(session) -> bool:
 
     batch_size = int(len(rows)**0.5)
 
-    for t, id, name in tqdm(enumerate(rows)):
+    for t, row in tqdm(enumerate(rows)):
+        pub_id, name = row
         try:
             session.execute(text("""
                                 UPDATE Publication 
                                 SET metaphone = :metaphone 
-                                WHERE id = :id
+                                WHERE id = :pub_id
                             """), {
                 'metaphone': process_phonetic(name),
-                'city_id': id
+                'pub_id': pub_id
             })
         except OperationalError as oe:
             continue
