@@ -1,7 +1,7 @@
 import re
 
 from fonetika.metaphone import RussianMetaphone
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 from sqlalchemy.exc import OperationalError
 from tqdm import tqdm
 
@@ -18,6 +18,11 @@ def process_phonetic(word):
     word = word.strip()
     return RussianMetaphone().transform(word)
 
+def column_exists(session, table_name, column_name):
+    """Проверяет, существует ли колонка в таблице"""
+    inspector = inspect(session.bind)
+    columns = inspector.get_columns(table_name)
+    return any(col['name'] == column_name for col in columns)
 
 def process_books_name(session) -> bool:
     '''
@@ -26,11 +31,12 @@ def process_books_name(session) -> bool:
     :return: Результат работы функции
     '''
     try:
-        session.execute(text("""
-                    ALTER TABLE Publication 
-                    ADD COLUMN IF NOT EXISTS metaphone VARCHAR(255) DEFAULT NULL
-                """))
-        session.commit()
+        if not column_exists(session, 'Publication', "metaphone"):
+            session.execute(text("""
+                        ALTER TABLE Publication 
+                        ADD COLUMN metaphone VARCHAR(255) DEFAULT NULL
+                    """))
+            session.commit()
     except OperationalError as oe:
         session.rollback()
         print(f"Error: {oe}")
