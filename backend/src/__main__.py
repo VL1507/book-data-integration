@@ -3,14 +3,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
+from settings import settings
+
+print(settings)
+
+
 app = FastAPI(title="Book API", description="API для работы с книгами")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",
+        settings.APP.FRONTEND_URL,
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -34,4 +37,4 @@ async def ping_pong():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=settings.APP.PORT)
