@@ -12,7 +12,7 @@ def process_word(word):
     :param word: Слово, которое необходимо преобразовать
     :return: Очищенная версия слова
     '''
-    bad_words = ['Манга', 'Новелла', 'Манхва', 'Подарочное издание', 'Официальный мерч', 'Тату']
+    bad_words = ['Манга', 'Новелла', 'Манхва', 'Подарочное издание', 'Официальный мерч', 'Тату', 'Роман', 'Артбук', 'Сборник', 'Повесть', '"', '«', '»', "'"]
     bad_words.extend([x.lower() for x in bad_words])
     word = re.sub(r'\(#([1-9])\)', lambda m: f'№{m.group(1)}', word)
     word = re.sub(r'\((?!Не\))(?!не\))[^)]*\)', '', word)
@@ -20,8 +20,10 @@ def process_word(word):
     word = re.sub(r'\+[^$]*', '', word)
     for b in bad_words:
         word = word.replace(b, '')
-    word = re.sub(r'\s+', ' ', word)
-    word = word.strip(' .')
+    while '..' in word or '  ' in word:
+        word = re.sub(r'\s+', ' ', word)
+        word = re.sub(r'(.)+', '.', word)
+    word = word.strip(' .,|:;')
     return word
 
 
