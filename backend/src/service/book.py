@@ -39,7 +39,7 @@ class BookService:
                 authors=row[2].split(","),
                 image_url=row[3],
                 year=row[4],
-                genres=row[5].split(","),
+                genres=row[5].split(",") if row[5] is not None else [],
             )
             for row in result
         ]
