@@ -13,6 +13,9 @@ services:
       DB__NAME: app
       APP__PORT: 8000
       APP__FRONTEND_URL: http://frontend:5173
+    depends_on:
+      my-mysql:
+        condition: service_healthy
 
   frontend:
     profiles: [ "site" ]
@@ -95,7 +98,6 @@ services:
         condition: service_completed_successfully
       metaphone:
         condition: service_completed_successfully
-  
 
 volumes:
   mysql_data:
