@@ -38,8 +38,11 @@ class BookRepository:
                     "genres"
                 ),
                 func.aggregate_strings(
-                    distinct(Annotation.description), separator=","
+                    Annotation.description.distinct(), separator=","
                 ).label("annotations"),
+                func.aggregate_strings(ISBN.isbn.distinct(), separator=",").label(
+                    "isbn"
+                ),
                 #
                 #
                 #

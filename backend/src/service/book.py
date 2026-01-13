@@ -48,6 +48,7 @@ class BookService:
             title=result[0].get("title"),
             authors=result[0].get("authors").split(","),
             genres=list(genres),
+            isbn=result[0].get("isbn").split(","),
             annotation=annotation,
             publication_site_info=publication_site_info,
         )

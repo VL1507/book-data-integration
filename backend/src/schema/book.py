@@ -29,5 +29,6 @@ class BookFull(BaseModel):
     title: str
     authors: list[str]
     genres: list[str]
+    isbn: list[str]
     annotation: str | None
     publication_site_info: list[PublicationSiteInfo]
