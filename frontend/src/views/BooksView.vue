@@ -30,7 +30,7 @@
     </div>
 
     <div v-else>
-      <div class="books-header">
+      <!-- <div class="books-header">
         <div class="books-stats">
           Найдено книг: <strong>{{ books.length }}</strong>
           <span v-if="hasMore" class="more-available">(есть еще)</span>
@@ -42,7 +42,7 @@
             <option value="year">По году</option>
           </select>
         </div>
-      </div>
+      </div> -->
 
       <div class="books-grid">
         <BookCard v-for="book in sortedBooks" :key="book.id" :book="book" />
