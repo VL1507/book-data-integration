@@ -13,22 +13,13 @@
       <div v-if="loading" class="loading">Загрузка книг...</div>
       <div v-else-if="error" class="error">{{ error }}</div>
       <div v-else class="books-grid">
-        <BookCard
-          v-for="book in featuredBooks"
-          :key="book.id"
-          :book="book"
-          @click="openBookModal(book)"
-        />
+        <BookCard v-for="book in featuredBooks" :key="book.publication_id" :book="book" />
       </div>
     </div>
 
-    <BookModal v-if="selectedBook" :book="selectedBook" @close="selectedBook = null" />
+    <!-- <BookModal v-if="selectedBook" :book="selectedBook" @close="selectedBook = null" /> -->
   </div>
 </template>
-
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
@@ -46,7 +37,7 @@ const loadFeaturedBooks = async () => {
   error.value = ''
 
   try {
-    featuredBooks.value = await bookApi.getBooks({ limit: 3 })
+    featuredBooks.value = await bookApi.getBooks({ limit: 4 })
   } catch (err) {
     console.error('Ошибка при загрузке книг:', err)
     error.value = 'Не удалось загрузить книги. Проверьте подключение к бэкенду.'
@@ -59,10 +50,6 @@ onMounted(() => {
   loadFeaturedBooks()
 })
 </script>
-
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 
 <style scoped>
 .home {

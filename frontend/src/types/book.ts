@@ -1,5 +1,5 @@
 export interface Book {
-  id: number
+  publication_id: number
   title: string
   authors: string[]
   years: number[]
@@ -15,4 +15,13 @@ export interface BookFilters {
   year_to?: number
   limit?: number
   offset?: number
+}
+
+export interface BookFull {
+  publication_id: number
+  title: string
+  authors: string[]
+  years: number[]
+  genres: string[]
+  image_url: string
 }

@@ -58,7 +58,7 @@ const formatGenres = computed(() => {
 })
 
 const handleImageError = (event: Event) => {
-  console.error(`Ошибка загрузки обложки книги ${props.book.id}`, props.book.image_url)
+  console.error(`Ошибка загрузки обложки книги ${props.book.publication_id}`, props.book.image_url)
   imageError.value = true
   imageLoaded.value = false
 
@@ -72,7 +72,7 @@ const handleImageLoad = () => {
 }
 
 const goToBookDetail = () => {
-  router.push(`/books/${props.book.id}`)
+  router.push(`/books/${props.book.publication_id}`)
 }
 </script>
 

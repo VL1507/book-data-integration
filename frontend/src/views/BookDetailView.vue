@@ -41,7 +41,7 @@
             </div>
             <div class="meta-item">
               <strong>ID:</strong>
-              <span>{{ book.id }}</span>
+              <span>{{ book.publication_id }}</span>
             </div>
           </div>
 
@@ -72,21 +72,17 @@
   </div>
 </template>
 
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 // import BookCard from '@/components/BookCard.vue'
 import { bookApi } from '@/services/api'
-import type { Book } from '@/types/book'
+import type { BookFull } from '@/types/book'
 
 const route = useRoute()
 const router = useRouter()
 
-const book = ref<Book | null>(null)
+const book = ref<BookFull | null>(null)
 // const relatedBooks = ref<Book[]>([])
 const loading = ref(false)
 const error = ref<string>('')
@@ -95,10 +91,10 @@ const imageError = ref(false)
 
 const bookId = computed(() => parseInt(route.params.publication_id as string))
 
-const coverUrl = computed(() => {
-  if (!book.value) return ''
-  return book.value.image_url
-})
+// const coverUrl = computed(() => {
+//   if (!book.value) return ''
+//   return book.value.image_url
+// })
 
 const loadBook = async () => {
   loading.value = true
@@ -141,9 +137,9 @@ const handleImageLoad = () => {
   imageError.value = false
 }
 
-const goToBook = (id: number) => {
-  router.push(`/books/${id}`)
-}
+// const goToBook = (id: number) => {
+//   router.push(`/books/${id}`)
+// }
 
 const goBack = () => {
   router.back()
@@ -164,10 +160,6 @@ watch(
   },
 )
 </script>
-
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 
 <style scoped>
 .book-detail {
