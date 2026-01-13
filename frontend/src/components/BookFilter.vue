@@ -11,7 +11,6 @@
     </div>
 
     <div class="filter-grid">
-
       <div class="filter-group">
         <label>Название</label>
         <input
@@ -92,17 +91,13 @@
   </div>
 </template>
 
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-
 <script setup lang="ts">
-import { ref, computed, watch, watchEffect } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { BookFilters } from '@/types/book'
-import CustomMinMaxSlider from './CustomMinMaxSlider.vue'
+// import CustomMinMaxSlider from './CustomMinMaxSlider.vue'
 
-const sliderMin = ref(50)
-const sliderMax = ref(80)
+// const sliderMin = ref(50)
+// const sliderMax = ref(80)
 
 interface Props {
   filters: BookFilters
@@ -139,15 +134,15 @@ const applyFilters = () => {
     }
   })
 
-  cleanedFilters.offset = 0 // Сбрасываем пагинацию при новом поиске
-  cleanedFilters.limit = props.filters.limit || 6
+  cleanedFilters.offset = 0
+  cleanedFilters.limit = props.filters.limit || 10
 
   emit('update:filters', cleanedFilters)
   emit('apply')
 }
 
 const resetFilters = () => {
-  localFilters.value = { limit: 6, offset: 0 }
+  localFilters.value = { limit: 10, offset: 0 }
   emit('reset')
 }
 

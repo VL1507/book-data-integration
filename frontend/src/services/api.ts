@@ -70,12 +70,12 @@ export const bookApi = {
     }
   },
 
-  async getBook(id: number): Promise<BookFull> {
+  async getBook(publication_id: number): Promise<BookFull> {
     try {
-      const response = await api.get<BookFull>(`/books/${id}`)
+      const response = await api.get<BookFull>(`/books/${publication_id}`)
       return response.data
     } catch (error) {
-      console.error(`Error fetching book ${id}:`, error)
+      console.error(`Error fetching book ${publication_id}:`, error)
       throw error
     }
   },

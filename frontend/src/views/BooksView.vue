@@ -45,7 +45,7 @@
       </div> -->
 
       <div class="books-grid">
-        <BookCard v-for="book in sortedBooks" :key="book.id" :book="book" />
+        <BookCard v-for="book in sortedBooks" :key="book.publication_id" :book="book" />
       </div>
 
       <div class="pagination" v-if="hasMore">
@@ -57,10 +57,6 @@
   </div>
 </template>
 
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import BookCard from '@/components/BookCard.vue'
@@ -71,16 +67,16 @@ import type { Book, BookFilters } from '@/types/book'
 const books = ref<Book[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
-const sortBy = ref<'title' | 'year' | 'author'>('title')
+const sortBy = ref<'title' | 'year' | 'author' | null>(null)
 const appliedFilters = ref<BookFilters>({})
 
 const filters = ref<BookFilters>({
-  limit: 6,
+  limit: 10,
   offset: 0,
 })
 
 const hasMore = computed(() => {
-  return books.value.length >= (filters.value.limit || 6)
+  return books.value.length >= (filters.value.limit || 10)
 })
 
 const sortedBooks = computed(() => {
@@ -90,7 +86,7 @@ const sortedBooks = computed(() => {
     case 'title':
       return sorted.sort((a, b) => a.title.localeCompare(b.title))
     case 'year':
-      return sorted.sort((a, b) => Math.min.apply(Math, b.years) - Math.min.apply(Math, a.years))
+      return sorted.sort((a, b) => Math.min(...b.years) - Math.min(...a.years))
     default:
       return sorted
   }
@@ -109,8 +105,8 @@ const updateFilters = (newFilters: BookFilters) => {
 }
 
 const resetFilters = async () => {
-  filters.value = { limit: 6, offset: 0 }
-  appliedFilters.value = { limit: 6, offset: 0 }
+  filters.value = { limit: 10, offset: 0 }
+  appliedFilters.value = { limit: 10, offset: 0 }
   await loadBooks(true)
 }
 
@@ -123,7 +119,6 @@ const loadBooks = async (reset: boolean = false) => {
   error.value = null
 
   try {
-    // if (appliedFilters.value.year_from !is)
     const newBooks = await bookApi.getBooks(appliedFilters.value)
 
     if (reset) {
@@ -147,19 +142,13 @@ const loadMore = async () => {
   await loadBooks(false)
 }
 
-const applySorting = () => {
-  // Сортировка применяется автоматически через computed свойство sortedBooks
-}
+// const applySorting = () => {
+// }
 
-// Загружаем книги при монтировании (без фильтров)
 onMounted(async () => {
   await loadBooks(true)
 })
 </script>
-
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
-<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 
 <style scoped>
 .books-view {
