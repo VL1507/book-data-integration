@@ -3,8 +3,8 @@ services:
     profiles: [ "site" ]
     container_name: backend
     build: ./backend/
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     environment:
       DB__USER: root
       DB__PASSWORD: ${DATA_MYSQL_PASSWORD}
