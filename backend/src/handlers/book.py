@@ -8,7 +8,7 @@ router = APIRouter(prefix="/books")
 
 @router.get("/{publication_id:int}")
 async def get_book_by_publication_id(
-    publication_id: str,
+    publication_id: int,
     book_service: BookService = Depends(get_book_service),
 ):
     print(publication_id)

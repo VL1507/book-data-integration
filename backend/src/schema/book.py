@@ -10,29 +10,24 @@ class BookForListSchema(BaseModel):
     image_url: str
 
 
-# class Annotation(BaseModel):
-#     language: str
-#     annotation: str
+class PublicationSiteInfo(BaseModel):
+    year: int
+    page_count: int
+    price: float
+    image_url: str
+    annotation: str | None
+    site_name: str
+    site_url: str
+    illustration_type: str | None
+    coverages_type: str | None
+    dim_x: int | None
+    dim_y: int | None
+    dim_z: int | None
 
 
-# class Publication(BaseModel):
-#     id: int
-#     isbn: str
-#     sites: list[str]
-#     authors_name: list[str]
-#     annotations: list[Annotation]
-#     page_count: int
-#     dim_x: int | None
-#     dim_y: int | None
-#     dim_z: int | None
-#     illustration_types_name: str | None
-#     coverages_types_name: str | None
-#     image_url: str | None
-
-
-# class BookInfo(BaseModel):
-#     id: int
-#     publications: list[Publication]
-#     title: str
-#     authors: list[str]
-#     year: int
+class BookFull(BaseModel):
+    publication_id: int
+    title: str
+    authors: list[str]
+    genres: list[str]
+    publication_site_info: list[PublicationSiteInfo]

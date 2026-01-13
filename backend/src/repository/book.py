@@ -1,4 +1,4 @@
-from sqlalchemy import and_, exists, func, select
+from sqlalchemy import and_, distinct, exists, func, label, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -28,7 +28,123 @@ class BookRepository:
         self.__db_session = db_session
 
     async def get_book_by_publication_id(self, publication_id: int):
-        pass
+        #         stmt = select(
+        #             text(f"""SELECT
+        # p.id,
+        # p.name,
+        # GROUP_CONCAT(DISTINCT a.name),
+        # GROUP_CONCAT(DISTINCT ann.description),
+        # GROUP_CONCAT(DISTINCT l.lang),
+        # ps.price,
+        # ps.image_url,
+        # s.site,
+        # s.url,
+        # it.name,
+        # ct.name,
+        # GROUP_CONCAT(DISTINCT g.genre),
+        # c.year,
+        # c.page_count,
+        # c.dim_x,
+        # c.dim_y,
+        # c.dim_z
+        # FROM PublicationSite ps
+        # LEFT JOIN Publication p ON p.id = ps.publication_id
+        # LEFT OUTER JOIN ISBN i ON i.publication_id = p.id
+        # LEFT JOIN PublishingHouses ph ON ph.id = i.publisher_id
+        # LEFT OUTER JOIN PublicationAuthors pa ON pa.publication_id = p.id
+        # LEFT JOIN Authors a ON a.id = pa.authors_id
+        # LEFT OUTER JOIN Annotation ann ON ann.publication_site_id = ps.id
+        # LEFT JOIN Language l ON l.id = ann.lang_id
+        # LEFT JOIN Sites s ON s.id = ps.site_id
+        # LEFT JOIN Characteristics c ON c.publication_site_id = ps.id
+        # LEFT JOIN IllustrationTypes it ON it.id = c.illustration_id
+        # LEFT JOIN CoveragesTypes ct ON ct.id = c.cover_id
+        # LEFT OUTER JOIN CharacteristicsGenre cg ON cg.characteristic_id = c.publication_site_id
+        # LEFT JOIN Genre g ON g.id = cg.genre_id
+        # WHERE p.id = {publication_id}
+        # GROUP BY ps.id
+        # """)
+        #         )
+        stmt = (
+            select(
+                Publication.id.label("publication_id"),
+                Publication.name.label("title"),
+                func.aggregate_strings(Authors.name.distinct(), separator=",").label(
+                    "authors"
+                ),
+                Characteristics.year,
+                func.aggregate_strings(Genre.genre.distinct(), separator=",").label(
+                    "genres"
+                ),
+                func.aggregate_strings(
+                    distinct(Annotation.description), separator=","
+                ).label("annotations"),
+                func.aggregate_strings(distinct(Language.lang), separator=",").label(
+                    "languages"
+                ),
+                PublicationSite.price,
+                PublicationSite.image_url,
+                Sites.site,
+                Sites.url,
+                IllustrationTypes.name.label("illustration_type"),
+                CoveragesTypes.name.label("cover_type"),
+                Characteristics.page_count,
+                Characteristics.dim_x,
+                Characteristics.dim_y,
+                Characteristics.dim_z,
+            )
+            .select_from(PublicationSite)
+            .join(
+                Publication,
+                Publication.id == PublicationSite.publication_id,
+                isouter=True,
+            )
+            .outerjoin(ISBN, ISBN.publication_id == Publication.id)
+            .join(
+                PublishingHouses, PublishingHouses.id == ISBN.publisher_id, isouter=True
+            )
+            .outerjoin(
+                PublicationAuthors,
+                PublicationAuthors.publication_id == Publication.id,
+            )
+            .join(Authors, Authors.id == PublicationAuthors.authors_id, isouter=True)
+            .outerjoin(
+                Annotation,
+                Annotation.publication_site_id == PublicationSite.id,
+            )
+            .join(Language, Language.id == Annotation.lang_id, isouter=True)
+            .join(Sites, Sites.id == PublicationSite.site_id, isouter=True)
+            .join(
+                Characteristics,
+                Characteristics.publication_site_id == PublicationSite.id,
+                isouter=True,
+            )
+            .join(
+                IllustrationTypes,
+                IllustrationTypes.id == Characteristics.illustration_id,
+                isouter=True,
+            )
+            .join(
+                CoveragesTypes,
+                CoveragesTypes.id == Characteristics.cover_id,
+                isouter=True,
+            )
+            .outerjoin(
+                CharacteristicsGenre,
+                CharacteristicsGenre.characteristic_id
+                == Characteristics.publication_site_id,
+            )
+            .join(Genre, Genre.id == CharacteristicsGenre.genre_id, isouter=True)
+            .where(Publication.id == publication_id)
+            .group_by(PublicationSite.id)
+        )
+        result = await self.__db_session.execute(statement=stmt)
+
+        book = list(result.mappings().all())
+
+        print(book)
+
+        return book
 
     async def get_books(
         self,
