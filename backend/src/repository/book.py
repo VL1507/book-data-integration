@@ -1,4 +1,4 @@
-from sqlalchemy import select, func
+from sqlalchemy import and_, exists, select, func
 from sqlalchemy.orm import aliased
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -80,11 +80,35 @@ class BookRepository:
             author_exists = (
                 select(PublicationAuthors.publication_id)
                 .join(Authors, Authors.id == PublicationAuthors.authors_id)
-                .where(Authors.name.like(f"%{author}%"))
-                .where(PublicationAuthors.publication_id == Publication.id)
+                .where(
+                    and_(
+                        Authors.name.ilike(f"%{author}%"),
+                        PublicationAuthors.publication_id == Publication.id,
+                    )
+                )
                 .exists()
             )
             stmt = stmt.where(author_exists)
+
+        if genre:
+            genre_exists = (
+                select(CharacteristicsGenre.characteristic_id)
+                .join(
+                    Characteristics,
+                    Characteristics.publication_site_id
+                    == CharacteristicsGenre.characteristic_id,
+                )
+                .join(Genre, Genre.id == CharacteristicsGenre.genre_id)
+                .where(
+                    and_(
+                        Genre.genre.ilike(f"%{genre}%"),
+                        Characteristics.publication_site_id == PublicationSite.id,
+                        PublicationSite.publication_id == Publication.id,
+                    )
+                )
+                .exists()
+            )
+            stmt = stmt.where(genre_exists)
 
         stmt = (
             stmt.limit(limit=limit)
