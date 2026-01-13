@@ -14,7 +14,7 @@
       <div class="book-layout">
         <div class="book-cover">
           <img
-            :src="coverUrl"
+            :src="book.image_url"
             :alt="book.title"
             @error="handleImageError"
             @load="handleImageLoad"
@@ -28,16 +28,16 @@
 
         <div class="book-info">
           <h1 class="book-title">{{ book.title }}</h1>
-          <p class="book-author">Автор: {{ book.author }}</p>
+          <p class="book-author">Автор: {{ book.authors }}</p>
 
           <div class="book-meta-grid">
             <div class="meta-item">
               <strong>Год издания:</strong>
-              <span>{{ book.year }}</span>
+              <span>{{ book.years }}</span>
             </div>
             <div class="meta-item">
               <strong>Жанр:</strong>
-              <span>{{ book.genre }}</span>
+              <span>{{ book.genres }}</span>
             </div>
             <div class="meta-item">
               <strong>ID:</strong>
@@ -45,10 +45,10 @@
             </div>
           </div>
 
-          <div class="book-description">
+          <!-- <div class="book-description">
             <h3>Описание</h3>
             <p>{{ book.description }}</p>
-          </div>
+          </div> -->
 
           <div class="action-buttons">
             <button @click="goBack" class="btn btn-secondary">← Назад</button>
@@ -72,6 +72,10 @@
   </div>
 </template>
 
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -93,7 +97,7 @@ const bookId = computed(() => parseInt(route.params.id as string))
 
 const coverUrl = computed(() => {
   if (!book.value) return ''
-  return bookApi.getBookCoverUrl(book.value.id)
+  return book.value.image_url
 })
 
 const loadBook = async () => {
@@ -109,7 +113,7 @@ const loadBook = async () => {
     // Загружаем похожие книги (того же жанра)
     const allBooks = await bookApi.getBooks()
     relatedBooks.value = allBooks
-      .filter((b) => b.id !== book.value!.id && b.genre === book.value!.genre)
+      .filter((b) => b.id !== book.value!.id && b.genres === book.value!.genres)
       .slice(0, 3)
   } catch (err: any) {
     console.error('Ошибка загрузки книги:', err)
@@ -121,7 +125,7 @@ const loadBook = async () => {
 }
 
 const handleImageError = (event: Event) => {
-  console.error(`Ошибка загрузки обложки для книги ${book.value?.id}:`, book.value?.image_filename)
+  console.error(`Ошибка загрузки обложки для книги ${book.value?.id}:`, book.value?.image_url)
   imageError.value = true
   imageLoaded.value = false
 
@@ -157,6 +161,10 @@ watch(
   },
 )
 </script>
+
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 
 <style scoped>
 .book-detail {

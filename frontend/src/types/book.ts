@@ -1,11 +1,10 @@
 export interface Book {
   id: number
   title: string
-  author: string
-  year: number
-  genre: string
-  description: string
-  image_filename: string
+  authors: string[]
+  years: number[]
+  genres: string[]
+  image_url: string
 }
 
 export interface BookFilters {

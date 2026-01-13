@@ -40,7 +40,6 @@
           <select v-model="sortBy" @change="applySorting" class="sort-select">
             <option value="title">По названию</option>
             <option value="year">По году</option>
-            <option value="author">По автору</option>
           </select>
         </div>
       </div>
@@ -57,6 +56,10 @@
     </div>
   </div>
 </template>
+
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
@@ -87,9 +90,7 @@ const sortedBooks = computed(() => {
     case 'title':
       return sorted.sort((a, b) => a.title.localeCompare(b.title))
     case 'year':
-      return sorted.sort((a, b) => b.year - a.year)
-    case 'author':
-      return sorted.sort((a, b) => a.author.localeCompare(b.author))
+      return sorted.sort((a, b) => Math.min.apply(Math, b.years) - Math.min.apply(Math, a.years))
     default:
       return sorted
   }
@@ -101,6 +102,12 @@ const applyFilters = async () => {
 }
 
 const updateFilters = (newFilters: BookFilters) => {
+  if (
+    typeof newFilters.year_from !== 'undefined' &&
+    newFilters.year_from < 1000
+  ) { 
+    newFilters.year_from = 1000
+  }
   filters.value = { ...newFilters }
 }
 
@@ -119,6 +126,7 @@ const loadBooks = async (reset: boolean = false) => {
   error.value = null
 
   try {
+    // if (appliedFilters.value.year_from !is)
     const newBooks = await bookApi.getBooks(appliedFilters.value)
 
     if (reset) {
@@ -127,7 +135,7 @@ const loadBooks = async (reset: boolean = false) => {
       books.value = [...books.value, ...newBooks]
     }
   } catch (err) {
-    error.value = 'Ошибка при загрузке книг'
+    // error.value = 'Ошибка при загрузке книг'
     console.error('Ошибка:', err)
   } finally {
     loading.value = false
@@ -151,6 +159,10 @@ onMounted(async () => {
   await loadBooks(true)
 })
 </script>
+
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ----------------------------------------------------------------------------------------------------------------------------- -->
 
 <style scoped>
 .books-view {

@@ -2,7 +2,7 @@
   <div class="book-card" @click="goToBookDetail">
     <div class="book-image">
       <img
-        :src="coverUrl"
+        :src="book.image_url"
         :alt="book.title"
         @error="handleImageError"
         @load="handleImageLoad"
@@ -13,18 +13,20 @@
     </div>
     <div class="book-info">
       <h3 class="book-title">{{ book.title }}</h3>
-      <p class="book-author">{{ book.author }}</p>
+      <p class="book-author">{{ book.authors }}</p>
       <div class="book-meta">
-        <span class="book-year">{{ book.year }}</span>
-        <span class="book-genre">{{ book.genre }}</span>
+        <span class="book-year">{{ book.years }}</span>
+        <span class="book-genre">{{ book.genres }}</span>
       </div>
-      <p class="book-description">{{ truncatedDescription }}</p>
+      <!-- <p class="book-description">{{ truncatedDescription }}</p> -->
       <div class="book-link">
         <span class="link-text">Подробнее →</span>
       </div>
     </div>
   </div>
 </template>
+
+
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
@@ -44,15 +46,15 @@ const imageError = ref(false)
 
 const coverUrl = computed(() => bookApi.getBookCoverUrl(props.book.id))
 
-const truncatedDescription = computed(() => {
-  const desc = props.book.description
-  return desc.length > 100 ? desc.substring(0, 100) + '...' : desc
-})
+// const truncatedDescription = computed(() => {
+//   const desc = props.book.description
+//   return desc.length > 100 ? desc.substring(0, 100) + '...' : desc
+// })
 
 const handleImageError = (event: Event) => {
   console.error(
     `Ошибка загрузки изображения для книги ${props.book.id}:`,
-    props.book.image_filename,
+    props.book.image_url,
   )
   imageError.value = true
   imageLoaded.value = false

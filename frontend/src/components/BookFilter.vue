@@ -32,18 +32,17 @@
       </div>
 
       <div class="filter-group">
-        <label>Год</label>
-        <div class="slider-cont">
-          <h3>Slider 3: {{ sliderMin }} - {{ sliderMax }}</h3>
-          <CustomMinMaxSlider
-            :max="2000"
-            v-model:min-value="sliderMin"
-            v-model:max-value="sliderMax"
-          />
-        </div>
+        <label>Год от</label>
+        <input 
+          min="1000"
+          v-model="localFilters.year_from"
+          type="number"
+          placeholder="От"
+          @keyup.enter="applyFilters"
+        />
       </div>
 
-      <!-- <div class="filter-group">
+      <div class="filter-group">
         <label>Год до</label>
         <input
           v-model="localFilters.year_to"
@@ -51,7 +50,7 @@
           placeholder="До"
           @keyup.enter="applyFilters"
         />
-      </div> -->
+      </div>
     </div>
 
     <div class="active-filters" v-if="hasActiveFilters">
@@ -114,23 +113,23 @@ const hasActiveFilters = computed(() => {
 })
 
 const applyFilters = () => {
-  console.log(localFilters.value.year_from)
-  console.log(localFilters.value.year_to)
+  // console.log(localFilters.value.year_from)
+  // console.log(localFilters.value.year_to)
 
-  // // Очищаем пустые значения перед отправкой
-  // const cleanedFilters: BookFilters = {}
+  // Очищаем пустые значения перед отправкой
+  const cleanedFilters: BookFilters = {}
 
-  // Object.entries(localFilters.value).forEach(([key, value]) => {
-  //   if (value !== undefined && value !== null && value !== '') {
-  //     cleanedFilters[key as keyof BookFilters] = value
-  //   }
-  // })
+  Object.entries(localFilters.value).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      cleanedFilters[key as keyof BookFilters] = value
+    }
+  })
 
-  // cleanedFilters.offset = 0 // Сбрасываем пагинацию при новом поиске
-  // cleanedFilters.limit = props.filters.limit || 6
+  cleanedFilters.offset = 0 // Сбрасываем пагинацию при новом поиске
+  cleanedFilters.limit = props.filters.limit || 6
 
-  // emit('update:filters', cleanedFilters)
-  // emit('apply')
+  emit('update:filters', cleanedFilters)
+  emit('apply')
 }
 
 const resetFilters = () => {
