@@ -10,6 +10,7 @@ export interface Book {
 export interface BookFilters {
   genre?: string
   author?: string
+  title?: string
   year_from?: number
   year_to?: number
   limit?: number

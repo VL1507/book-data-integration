@@ -11,6 +11,17 @@
     </div>
 
     <div class="filter-grid">
+
+      <div class="filter-group">
+        <label>Название</label>
+        <input
+          v-model="localFilters.title"
+          type="text"
+          placeholder="Введите Название..."
+          @keyup.enter="applyFilters"
+        />
+      </div>
+
       <div class="filter-group">
         <label>Жанр</label>
         <input
@@ -56,6 +67,10 @@
     <div class="active-filters" v-if="hasActiveFilters">
       <h4>Активные фильтры:</h4>
       <div class="filter-tags">
+        <span v-if="localFilters.title" class="filter-tag">
+          Название: {{ localFilters.title }}
+          <button @click="removeFilter('title')" class="remove-tag">×</button>
+        </span>
         <span v-if="localFilters.genre" class="filter-tag">
           Жанр: {{ localFilters.genre }}
           <button @click="removeFilter('genre')" class="remove-tag">×</button>
