@@ -113,8 +113,6 @@ class BookRepository:
 
         book = list(result.mappings().all())
 
-        print(book)
-
         return book
 
     async def get_books(

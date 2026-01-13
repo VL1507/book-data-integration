@@ -40,7 +40,8 @@
 
           <div class="book-annotation" v-if="book.annotation">
             <h3>Аннотация</h3>
-            <p>{{ book.annotation }}</p>
+            <!-- <p>{{ book.annotation }}</p> -->
+            <p>{{ shortAnnotation }}</p>
           </div>
         </div>
       </div>
@@ -110,6 +111,21 @@ const loading = ref(true)
 const error = ref('')
 const imageLoaded = ref(false)
 const imageError = ref(false)
+
+const MAX_ANNOTATION_LENGTH = 1300 // подбери под дизайн
+const shortAnnotation = computed(() => {
+  if (!book.value?.annotation) return ''
+  const text = book.value.annotation.trim()
+
+  const dotIndex = text.lastIndexOf('.')
+
+  if (dotIndex >= 0) {
+    return text.slice(0, dotIndex + 1) + '…'
+  }
+
+  // запасной вариант — просто по длине
+  return text.slice(0, MAX_ANNOTATION_LENGTH).replace(/[.,!?;]$/, '') + '…'
+})
 
 const bookId = computed(() => Number(route.params.publication_id))
 
