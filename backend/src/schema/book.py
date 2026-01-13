@@ -15,7 +15,6 @@ class PublicationSiteInfo(BaseModel):
     page_count: int
     price: float
     image_url: str
-    annotation: str | None
     site_name: str
     site_url: str
     illustration_type: str | None
@@ -30,4 +29,5 @@ class BookFull(BaseModel):
     title: str
     authors: list[str]
     genres: list[str]
+    annotation: str | None
     publication_site_info: list[PublicationSiteInfo]

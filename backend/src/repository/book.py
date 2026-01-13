@@ -1,6 +1,5 @@
-from sqlalchemy import and_, distinct, exists, func, label, select, text
+from sqlalchemy import and_, distinct, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import aliased
 
 from database.models import (
     ISBN,
@@ -28,43 +27,6 @@ class BookRepository:
         self.__db_session = db_session
 
     async def get_book_by_publication_id(self, publication_id: int):
-        #         stmt = select(
-        #             text(f"""SELECT
-        # p.id,
-        # p.name,
-        # GROUP_CONCAT(DISTINCT a.name),
-        # GROUP_CONCAT(DISTINCT ann.description),
-        # GROUP_CONCAT(DISTINCT l.lang),
-        # ps.price,
-        # ps.image_url,
-        # s.site,
-        # s.url,
-        # it.name,
-        # ct.name,
-        # GROUP_CONCAT(DISTINCT g.genre),
-        # c.year,
-        # c.page_count,
-        # c.dim_x,
-        # c.dim_y,
-        # c.dim_z
-        # FROM PublicationSite ps
-        # LEFT JOIN Publication p ON p.id = ps.publication_id
-        # LEFT OUTER JOIN ISBN i ON i.publication_id = p.id
-        # LEFT JOIN PublishingHouses ph ON ph.id = i.publisher_id
-        # LEFT OUTER JOIN PublicationAuthors pa ON pa.publication_id = p.id
-        # LEFT JOIN Authors a ON a.id = pa.authors_id
-        # LEFT OUTER JOIN Annotation ann ON ann.publication_site_id = ps.id
-        # LEFT JOIN Language l ON l.id = ann.lang_id
-        # LEFT JOIN Sites s ON s.id = ps.site_id
-        # LEFT JOIN Characteristics c ON c.publication_site_id = ps.id
-        # LEFT JOIN IllustrationTypes it ON it.id = c.illustration_id
-        # LEFT JOIN CoveragesTypes ct ON ct.id = c.cover_id
-        # LEFT OUTER JOIN CharacteristicsGenre cg ON cg.characteristic_id = c.publication_site_id
-        # LEFT JOIN Genre g ON g.id = cg.genre_id
-        # WHERE p.id = {publication_id}
-        # GROUP BY ps.id
-        # """)
-        #         )
         stmt = (
             select(
                 Publication.id.label("publication_id"),
@@ -72,23 +34,26 @@ class BookRepository:
                 func.aggregate_strings(Authors.name.distinct(), separator=",").label(
                     "authors"
                 ),
-                Characteristics.year,
                 func.aggregate_strings(Genre.genre.distinct(), separator=",").label(
                     "genres"
                 ),
                 func.aggregate_strings(
                     distinct(Annotation.description), separator=","
                 ).label("annotations"),
-                func.aggregate_strings(distinct(Language.lang), separator=",").label(
-                    "languages"
-                ),
+                #
+                #
+                #
+                Characteristics.year,
+                Characteristics.page_count,
                 PublicationSite.price,
                 PublicationSite.image_url,
-                Sites.site,
-                Sites.url,
+                Sites.site.label("site_name"),
+                Sites.url.label("site_url"),
                 IllustrationTypes.name.label("illustration_type"),
-                CoveragesTypes.name.label("cover_type"),
-                Characteristics.page_count,
+                CoveragesTypes.name.label("coverages_type"),
+                func.aggregate_strings(Language.lang.distinct(), separator=",").label(
+                    "languages"
+                ),
                 Characteristics.dim_x,
                 Characteristics.dim_y,
                 Characteristics.dim_z,
@@ -99,18 +64,20 @@ class BookRepository:
                 Publication.id == PublicationSite.publication_id,
                 isouter=True,
             )
-            .outerjoin(ISBN, ISBN.publication_id == Publication.id)
+            .join(ISBN, ISBN.publication_id == Publication.id, isouter=True)
             .join(
                 PublishingHouses, PublishingHouses.id == ISBN.publisher_id, isouter=True
             )
-            .outerjoin(
+            .join(
                 PublicationAuthors,
                 PublicationAuthors.publication_id == Publication.id,
+                isouter=True,
             )
-            .join(Authors, Authors.id == PublicationAuthors.authors_id, isouter=True)
-            .outerjoin(
+            .join(Authors, Authors.id == PublicationAuthors.authors_id)
+            .join(
                 Annotation,
                 Annotation.publication_site_id == PublicationSite.id,
+                isouter=True,
             )
             .join(Language, Language.id == Annotation.lang_id, isouter=True)
             .join(Sites, Sites.id == PublicationSite.site_id, isouter=True)
@@ -129,10 +96,11 @@ class BookRepository:
                 CoveragesTypes.id == Characteristics.cover_id,
                 isouter=True,
             )
-            .outerjoin(
+            .join(
                 CharacteristicsGenre,
                 CharacteristicsGenre.characteristic_id
                 == Characteristics.publication_site_id,
+                isouter=True,
             )
             .join(Genre, Genre.id == CharacteristicsGenre.genre_id, isouter=True)
             .where(Publication.id == publication_id)

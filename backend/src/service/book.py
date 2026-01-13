@@ -1,5 +1,5 @@
 from repository.book import BookRepository
-from schema.book import BookForListSchema, BookFull
+from schema.book import BookForListSchema, BookFull, PublicationSiteInfo
 
 
 class BookService:
@@ -10,11 +10,49 @@ class BookService:
         result = await self.__book_repository.get_book_by_publication_id(
             publication_id=publication_id
         )
-        if result is None:
+        if len(result) == 0:
             return None
-        # book 
-        # return book
-        return 1
+
+        publication_site_info: list[PublicationSiteInfo] = []
+
+        genres: set[str] = set()
+        annotation = None
+
+        for row_mapping in result:
+            psi = PublicationSiteInfo(
+                year=row_mapping.get("year"),
+                page_count=row_mapping.get("page_count"),
+                price=row_mapping.get("price"),
+                image_url=row_mapping.get("image_url"),
+                site_name=row_mapping.get("site_name"),
+                site_url=row_mapping.get("site_url"),
+                illustration_type=row_mapping.get("illustration_type"),
+                coverages_type=row_mapping.get("coverages_type"),
+                dim_x=row_mapping.get("dim_x"),
+                dim_y=row_mapping.get("dim_y"),
+                dim_z=row_mapping.get("dim_z"),
+            )
+            publication_site_info.append(psi)
+
+            genre = row_mapping.get("genres")
+            if genre is not None:
+                for g in genre.split(","):
+                    genres.add(g)
+
+            ann = row_mapping.get("annotations")
+            if ann is not None:
+                annotation = ann
+
+        book = BookFull(
+            publication_id=result[0].get("publication_id"),
+            title=result[0].get("title"),
+            authors=result[0].get("authors").split(","),
+            genres=list(genres),
+            annotation=annotation,
+            publication_site_info=publication_site_info,
+        )
+
+        return book
 
     async def get_books(
         self,
