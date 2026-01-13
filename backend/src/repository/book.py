@@ -110,6 +110,28 @@ class BookRepository:
             )
             stmt = stmt.where(genre_exists)
 
+        if year_from is not None or year_to is not None:
+            year_exists_stmt = (
+                select(Characteristics.publication_site_id)
+                .join(
+                    PublicationSite,
+                    PublicationSite.id == Characteristics.publication_site_id,
+                )
+                .where(PublicationSite.publication_id == Publication.id)
+            )
+
+            if year_from is not None:
+                year_exists_stmt = year_exists_stmt.where(
+                    Characteristics.year >= year_from
+                )
+            if year_to is not None:
+                year_exists_stmt = year_exists_stmt.where(
+                    Characteristics.year <= year_to
+                )
+
+            year_exists = year_exists_stmt.exists()
+            stmt = stmt.where(year_exists)
+
         stmt = (
             stmt.limit(limit=limit)
             .offset(offset=offset)
