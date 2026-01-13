@@ -34,6 +34,7 @@ class BookRepository:
         self,
         limit: int = 100,
         offset: int = 0,
+        title: str | None = None,
         genre: str | None = None,
         author: str | None = None,
         year_from: int | None = None,
@@ -89,6 +90,9 @@ class BookRepository:
                 .exists()
             )
             stmt = stmt.where(author_exists)
+
+        if title:
+            stmt = stmt.where(Publication.name.ilike(f"%{title}%"))
 
         if genre:
             genre_exists = (

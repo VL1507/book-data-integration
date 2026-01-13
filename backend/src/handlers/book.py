@@ -23,6 +23,7 @@ async def get_book_by_publication_id(
 
 @router.get("/")
 async def get_books(
+    title: str | None = Query(None, description="Фильтр по названию книги"),
     genre: str | None = Query(None, description="Фильтр по жанру"),
     author: str | None = Query(None, description="Фильтр по автору"),
     year_from: int | None = Query(None, description="Год от", ge=1000, le=2100),
@@ -34,6 +35,7 @@ async def get_books(
     books = await book_service.get_books(
         limit=limit,
         offset=offset,
+        title=title,
         genre=genre,
         author=author,
         year_from=year_from,

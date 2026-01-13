@@ -19,6 +19,7 @@ class BookService:
         self,
         limit: int = 100,
         offset: int = 0,
+        title: str | None = None,
         genre: str | None = None,
         author: str | None = None,
         year_from: int | None = None,
@@ -27,6 +28,7 @@ class BookService:
         result = await self.__book_repository.get_books(
             limit=limit,
             offset=offset,
+            title=title,
             genre=genre,
             author=author,
             year_from=year_from,
