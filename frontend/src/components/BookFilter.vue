@@ -33,7 +33,7 @@
 
       <div class="filter-group">
         <label>Год от</label>
-        <input 
+        <input
           min="1000"
           v-model="localFilters.year_from"
           type="number"
@@ -84,11 +84,10 @@
 <script setup lang="ts">
 import { ref, computed, watch, watchEffect } from 'vue'
 import type { BookFilters } from '@/types/book'
-import CustomMinMaxSlider from "./CustomMinMaxSlider.vue";
+import CustomMinMaxSlider from './CustomMinMaxSlider.vue'
 
-const sliderMin = ref(50);
-const sliderMax = ref(80);
-
+const sliderMin = ref(50)
+const sliderMax = ref(80)
 
 interface Props {
   filters: BookFilters
@@ -185,7 +184,6 @@ watch(
   display: flex;
   gap: 0.5rem;
 }
-
 
 .apply-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

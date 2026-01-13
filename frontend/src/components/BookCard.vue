@@ -26,8 +26,6 @@
   </div>
 </template>
 
-
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -52,10 +50,7 @@ const coverUrl = computed(() => bookApi.getBookCoverUrl(props.book.id))
 // })
 
 const handleImageError = (event: Event) => {
-  console.error(
-    `Ошибка загрузки изображения для книги ${props.book.id}:`,
-    props.book.image_url,
-  )
+  console.error(`Ошибка загрузки изображения для книги ${props.book.id}:`, props.book.image_url)
   imageError.value = true
   imageLoaded.value = false
 

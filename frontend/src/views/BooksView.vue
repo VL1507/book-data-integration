@@ -102,10 +102,7 @@ const applyFilters = async () => {
 }
 
 const updateFilters = (newFilters: BookFilters) => {
-  if (
-    typeof newFilters.year_from !== 'undefined' &&
-    newFilters.year_from < 1000
-  ) { 
+  if (typeof newFilters.year_from !== 'undefined' && newFilters.year_from < 1000) {
     newFilters.year_from = 1000
   }
   filters.value = { ...newFilters }
