@@ -57,8 +57,6 @@ export const bookApi = {
 
   async getBooks(filters: BookFilters = {}): Promise<Book[]> {
     try {
-      console.log('Fetching books with filters:', filters)
-
       const params: Record<string, string> = {}
 
       Object.entries(filters).forEach(([key, value]) => {
@@ -68,7 +66,6 @@ export const bookApi = {
       })
 
       const response = await api.get<Book[]>('/books/', { params })
-      console.log('Books received:', response.data.length)
       return response.data
     } catch (error) {
       console.error('Error fetching books:', error)
@@ -78,7 +75,6 @@ export const bookApi = {
 
   async getBook(id: number): Promise<BookFull> {
     try {
-      console.log(`Fetching book with id: ${id}`)
       const response = await api.get<BookFull>(`/books/${id}`)
       return response.data
     } catch (error) {
