@@ -57,7 +57,7 @@
         </div>
       </div>
 
-      <div class="related-books" v-if="relatedBooks.length > 0">
+      <!-- <div class="related-books" v-if="relatedBooks.length > 0">
         <h2>Похожие книги</h2>
         <div class="related-grid">
           <BookCard
@@ -67,7 +67,7 @@
             @click="goToBook(relatedBook.id)"
           />
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -79,7 +79,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import BookCard from '@/components/BookCard.vue'
+// import BookCard from '@/components/BookCard.vue'
 import { bookApi } from '@/services/api'
 import type { Book } from '@/types/book'
 
@@ -87,13 +87,13 @@ const route = useRoute()
 const router = useRouter()
 
 const book = ref<Book | null>(null)
-const relatedBooks = ref<Book[]>([])
+// const relatedBooks = ref<Book[]>([])
 const loading = ref(false)
 const error = ref<string>('')
 const imageLoaded = ref(false)
 const imageError = ref(false)
 
-const bookId = computed(() => parseInt(route.params.id as string))
+const bookId = computed(() => parseInt(route.params.publication_id as string))
 
 const coverUrl = computed(() => {
   if (!book.value) return ''
@@ -111,10 +111,10 @@ const loadBook = async () => {
     book.value = await bookApi.getBook(bookId.value)
 
     // Загружаем похожие книги (того же жанра)
-    const allBooks = await bookApi.getBooks()
-    relatedBooks.value = allBooks
-      .filter((b) => b.id !== book.value!.id && b.genres === book.value!.genres)
-      .slice(0, 3)
+    // const allBooks = await bookApi.getBooks()
+    // relatedBooks.value = allBooks
+    //   .filter((b) => b.id !== book.value!.id && b.genres === book.value!.genres)
+    //   .slice(0, 3)
   } catch (err: any) {
     console.error('Ошибка загрузки книги:', err)
     error.value =
@@ -125,7 +125,10 @@ const loadBook = async () => {
 }
 
 const handleImageError = (event: Event) => {
-  console.error(`Ошибка загрузки обложки для книги ${book.value?.id}:`, book.value?.image_url)
+  console.error(
+    `Ошибка загрузки обложки для книги ${book.value?.publication_id}:`,
+    book.value?.image_url,
+  )
   imageError.value = true
   imageLoaded.value = false
 
