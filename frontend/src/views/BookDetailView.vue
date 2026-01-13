@@ -1,81 +1,118 @@
 <template>
   <div class="book-detail">
     <div class="back-nav">
-      <router-link to="/books" class="back-link"> ← Назад к каталогу </router-link>
+      <router-link to="/books" class="back-link"> ← Назад к каталогу</router-link>
     </div>
 
     <div v-if="loading" class="loading">Загрузка информации о книге...</div>
 
-    <div v-else-if="error" class="error">
-      {{ error }}
-    </div>
+    <div v-else-if="error" class="error">{{ error }}</div>
 
     <div v-else-if="book" class="book-content">
       <div class="book-layout">
+        <!-- Левая часть — основная обложка (берём первую) -->
         <div class="book-cover">
           <img
-            :src="book.image_url"
+            v-if="mainCover"
+            :src="mainCover"
             :alt="book.title"
             @error="handleImageError"
             @load="handleImageLoad"
             :class="{ loaded: imageLoaded, error: imageError }"
           />
-          <div v-if="!imageLoaded && !imageError" class="image-placeholder">
+          <div v-else-if="!imageLoaded && !imageError" class="image-placeholder">
             📖 Загрузка обложки...
           </div>
-          <div v-if="imageError" class="image-placeholder error">❌ Обложка недоступна</div>
+          <div v-if="imageError || !mainCover" class="image-placeholder error">
+            ❌ Обложка недоступна
+          </div>
         </div>
 
         <div class="book-info">
           <h1 class="book-title">{{ book.title }}</h1>
-          <p class="book-author">Автор: {{ book.authors }}</p>
 
-          <div class="book-meta-grid">
+          <p class="book-author">
+            {{ book.authors.length ? book.authors.join(', ') : 'Автор не указан' }}
+          </p>
+
+          <div class="book-meta">
             <div class="meta-item">
-              <strong>Год издания:</strong>
-              <span>{{ book.years }}</span>
+              <strong>Жанр{{ book.genres.length > 1 ? 'ы' : '' }}:</strong>
+              <span>{{ book.genres.join(', ') || '—' }}</span>
             </div>
             <div class="meta-item">
-              <strong>Жанр:</strong>
-              <span>{{ book.genres }}</span>
-            </div>
-            <div class="meta-item">
-              <strong>ID:</strong>
+              <strong>ID публикации:</strong>
               <span>{{ book.publication_id }}</span>
             </div>
           </div>
 
-          <!-- <div class="book-description">
-            <h3>Описание</h3>
-            <p>{{ book.description }}</p>
-          </div> -->
+          <div v-if="annotation" class="book-description">
+            <h3>Аннотация</h3>
+            <p>{{ annotation }}</p>
+          </div>
+
+          <!-- Блок изданий -->
+          <div class="editions-section" v-if="book.publication_site_info.length">
+            <h3>Доступные издания</h3>
+            <div class="editions-list">
+              <div
+                v-for="(site, index) in book.publication_site_info"
+                :key="index"
+                class="edition-card"
+              >
+                <div class="edition-header">
+                  <h4>{{ site.site_name }}</h4>
+                  <span class="year">{{ site.year }}</span>
+                </div>
+
+                <div class="edition-meta">
+                  <div>
+                    Страниц: <strong>{{ site.page_count || '—' }}</strong>
+                  </div>
+                  <div>
+                    Цена: <strong>{{ site.price ? site.price + ' ₽' : '—' }}</strong>
+                  </div>
+                  <div v-if="site.illustration_type">
+                    Иллюстрации: <strong>{{ site.illustration_type }}</strong>
+                  </div>
+                  <div v-if="site.coverages_type">
+                    Переплёт: <strong>{{ site.coverages_type }}</strong>
+                  </div>
+                  <div v-if="site.dim_x && site.dim_y">
+                    Размер:
+                    <strong
+                      >{{ site.dim_x }} × {{ site.dim_y }}
+                      {{ site.dim_z ? '× ' + site.dim_z : '' }} мм</strong
+                    >
+                  </div>
+                </div>
+
+                <a
+                  v-if="site.site_url"
+                  :href="site.site_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-small btn-primary"
+                >
+                  Перейти на сайт
+                </a>
+              </div>
+            </div>
+          </div>
 
           <div class="action-buttons">
             <button @click="goBack" class="btn btn-secondary">← Назад</button>
-            <router-link to="/books" class="btn btn-primary"> К каталогу </router-link>
+            <router-link to="/books" class="btn btn-primary">К каталогу</router-link>
           </div>
         </div>
       </div>
-
-      <!-- <div class="related-books" v-if="relatedBooks.length > 0">
-        <h2>Похожие книги</h2>
-        <div class="related-grid">
-          <BookCard
-            v-for="relatedBook in relatedBooks"
-            :key="relatedBook.id"
-            :book="relatedBook"
-            @click="goToBook(relatedBook.id)"
-          />
-        </div>
-      </div> -->
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// import BookCard from '@/components/BookCard.vue'
 import { bookApi } from '@/services/api'
 import type { BookFull } from '@/types/book'
 
@@ -83,18 +120,20 @@ const route = useRoute()
 const router = useRouter()
 
 const book = ref<BookFull | null>(null)
-// const relatedBooks = ref<Book[]>([])
-const loading = ref(false)
-const error = ref<string>('')
+const loading = ref(true)
+const error = ref('')
 const imageLoaded = ref(false)
 const imageError = ref(false)
 
-const bookId = computed(() => parseInt(route.params.publication_id as string))
+const bookId = computed(() => Number(route.params.publication_id))
 
-// const coverUrl = computed(() => {
-//   if (!book.value) return ''
-//   return book.value.image_url
-// })
+const mainCover = computed(() => {
+  if (!book.value?.publication_site_info?.length) return ''
+  // Берём первую обложку, либо можно выбрать самую свежую по году
+  return book.value.publication_site_info[0].image_url || ''
+})
+
+const annotation = computed(() => book.value?.annotation || '')
 
 const loadBook = async () => {
   loading.value = true
@@ -103,33 +142,19 @@ const loadBook = async () => {
   imageError.value = false
 
   try {
-    // Загружаем информацию о книге
     book.value = await bookApi.getBook(bookId.value)
-
-    // Загружаем похожие книги (того же жанра)
-    // const allBooks = await bookApi.getBooks()
-    // relatedBooks.value = allBooks
-    //   .filter((b) => b.id !== book.value!.id && b.genres === book.value!.genres)
-    //   .slice(0, 3)
+    console.log('Book loaded:', book.value)
   } catch (err: any) {
     console.error('Ошибка загрузки книги:', err)
-    error.value =
-      err.response?.status === 404 ? 'Книга не найдена' : 'Ошибка при загрузке информации о книге'
+    error.value = err.response?.status === 404 ? 'Книга не найдена' : 'Ошибка при загрузке данных'
   } finally {
     loading.value = false
   }
 }
 
-const handleImageError = (event: Event) => {
-  console.error(
-    `Ошибка загрузки обложки для книги ${book.value?.publication_id}:`,
-    book.value?.image_url,
-  )
+const handleImageError = () => {
   imageError.value = true
   imageLoaded.value = false
-
-  const target = event.target as HTMLImageElement
-  target.style.display = 'none'
 }
 
 const handleImageLoad = () => {
@@ -137,28 +162,11 @@ const handleImageLoad = () => {
   imageError.value = false
 }
 
-// const goToBook = (id: number) => {
-//   router.push(`/books/${id}`)
-// }
-
 const goBack = () => {
   router.back()
 }
 
-// Загружаем книгу при монтировании
-onMounted(() => {
-  loadBook()
-})
-
-// Реагируем на изменение ID в URL
-watch(
-  () => route.params.id,
-  (newId) => {
-    if (newId) {
-      loadBook()
-    }
-  },
-)
+onMounted(loadBook)
 </script>
 
 <style scoped>
@@ -169,250 +177,220 @@ watch(
 }
 
 .back-nav {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .back-link {
-  display: inline-flex;
-  align-items: center;
-  color: #667eea;
+  color: #4f46e5;
   text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s;
 }
 
 .back-link:hover {
-  color: #5a67d8;
-}
-
-.loading,
-.error {
-  text-align: center;
-  padding: 3rem;
-  font-size: 1.1rem;
-}
-
-.error {
-  background: #fee;
-  color: #c33;
-  border-radius: 8px;
-  border: 1px solid #fcc;
-}
-
-.book-content {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  text-decoration: underline;
 }
 
 .book-layout {
   display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 3rem;
-  padding: 3rem;
+  grid-template-columns: 380px 1fr;
+  gap: 2.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
 }
 
 .book-cover {
-  width: 100%;
-  height: 500px;
   position: relative;
-  background: #f8f9fa;
+  height: 520px;
+  background: #f8fafc;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
 
 .book-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-}
-
-.book-cover img.error {
-  display: none;
-}
-
-.image-placeholder {
-  color: #666;
-  font-size: 1.2rem;
-  text-align: center;
-  padding: 2rem;
-}
-
-.image-placeholder.error {
-  color: #dc3545;
 }
 
 .book-info {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.4rem;
 }
 
 .book-title {
-  font-size: 2.5rem;
+  font-size: 2.4rem;
   font-weight: 700;
-  color: #333;
-  line-height: 1.2;
   margin: 0;
+  line-height: 1.15;
 }
 
 .book-author {
-  font-size: 1.3rem;
-  color: #667eea;
-  font-weight: 500;
-  margin: 0;
+  font-size: 1.35rem;
+  color: #6366f1;
+  margin: 0.25rem 0 1rem;
 }
 
-.book-meta-grid {
-  display: grid;
-  gap: 1rem;
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
+.book-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .meta-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.meta-item:last-child {
-  border-bottom: none;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .meta-item strong {
-  color: #555;
+  font-weight: 600;
+  color: #1f2937;
 }
 
-.meta-item span {
-  color: #333;
+.book-description {
+  margin: 1.5rem 0;
+  line-height: 1.65;
+  color: #374151;
+}
+
+.editions-section {
+  margin: 2rem 0;
+}
+
+.editions-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  color: #111827;
+}
+
+.editions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.edition-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  transition: all 0.18s;
+}
+
+.edition-card:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  transform: translateY(-2px);
+}
+
+.edition-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.9rem;
+}
+
+.edition-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1e40af;
+}
+
+.year {
+  font-size: 1.1rem;
+  color: #4b5563;
   font-weight: 500;
 }
 
-.book-description h3 {
-  font-size: 1.3rem;
-  color: #333;
-  margin-bottom: 1rem;
+.edition-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.8rem 1.5rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.98rem;
+  color: #4b5563;
 }
 
-.book-description p {
-  line-height: 1.7;
-  color: #555;
-  font-size: 1.1rem;
+.edition-meta strong {
+  color: #111827;
 }
 
 .action-buttons {
   display: flex;
   gap: 1rem;
-  margin-top: auto;
-  padding-top: 2rem;
-  border-top: 1px solid #e9ecef;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
 }
 
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.6rem;
   border-radius: 8px;
-  text-decoration: none;
   font-weight: 500;
-  transition: all 0.3s;
-  border: none;
   cursor: pointer;
-  font-size: 1rem;
+  transition: all 0.2s;
+  border: none;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #6366f1;
   color: white;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  background: #4f46e5;
 }
 
 .btn-secondary {
-  background: #6c757d;
+  background: #6b7280;
   color: white;
 }
 
 .btn-secondary:hover {
-  background: #5a6268;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+  background: #4b5563;
 }
 
-.related-books {
-  padding: 3rem;
-  border-top: 1px solid #e9ecef;
-  background: #f8f9fa;
+.btn-small {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
 }
 
-.related-books h2 {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 2rem;
+.loading,
+.error {
   text-align: center;
+  padding: 4rem 1rem;
+  font-size: 1.2rem;
 }
 
-.related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+.error {
+  color: #dc2626;
+  background: #fef2f2;
+  border-radius: 12px;
 }
 
-@media (max-width: 968px) {
+@media (max-width: 992px) {
   .book-layout {
     grid-template-columns: 1fr;
-    gap: 2rem;
     padding: 2rem;
   }
-
   .book-cover {
-    height: 400px;
-    max-width: 300px;
+    height: 420px;
+    max-width: 340px;
     margin: 0 auto;
-  }
-
-  .book-title {
-    font-size: 2rem;
-    text-align: center;
-  }
-
-  .book-author {
-    text-align: center;
   }
 }
 
-@media (max-width: 768px) {
-  .book-detail {
-    padding: 1rem;
+@media (max-width: 640px) {
+  .book-title {
+    font-size: 2rem;
   }
-
-  .book-layout {
-    padding: 1.5rem;
-  }
-
-  .related-books {
-    padding: 2rem 1.5rem;
-  }
-
   .action-buttons {
     flex-direction: column;
-  }
-
-  .btn {
-    text-align: center;
   }
 }
 </style>

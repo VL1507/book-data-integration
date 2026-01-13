@@ -17,11 +17,26 @@ export interface BookFilters {
   offset?: number
 }
 
+export interface PublicationSiteInfo {
+  year: number
+  page_count: number
+  price: number
+  image_url: string
+  site_name: string
+  site_url: string
+  illustration_type?: string
+  coverages_type?: string
+  dim_x?: number
+  dim_y?: number
+  dim_z?: number
+}
+
 export interface BookFull {
   publication_id: number
   title: string
   authors: string[]
-  years: number[]
   genres: string[]
-  image_url: string
+  isbn: string[]
+  annotation?: string
+  publication_site_info: PublicationSiteInfo[]
 }

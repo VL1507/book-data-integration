@@ -45,7 +45,6 @@ const testConnection = async () => {
     { name: 'Health Check', test: async () => await bookApi.healthCheck() },
     { name: 'Список книг', test: async () => await bookApi.getBooks({ limit: 1 }) },
     { name: 'Информация о книге', test: async () => await bookApi.getBook(1) },
-    { name: 'Изображение книги', test: async () => await bookApi.getBookCover(1) },
   ]
 
   for (const test of tests) {
