@@ -1,8 +1,6 @@
 import axios from 'axios'
 import type { Book, BookFilters, BookFull } from '@/types/book'
 
-// TODO: добавить путь в env
-// const API_BASE_URL = 'http://book_backend:8000'
 const API_BASE_URL = '/api'
 
 const api = axios.create({
@@ -13,7 +11,6 @@ const api = axios.create({
   },
 })
 
-// Добавляем интерцептор для логирования
 api.interceptors.request.use(
   (config) => {
     console.log(`Making ${config.method?.toUpperCase()} request to: ${config.url}`)
