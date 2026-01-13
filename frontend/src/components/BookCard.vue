@@ -13,10 +13,10 @@
     </div>
     <div class="book-info">
       <h3 class="book-title">{{ book.title }}</h3>
-      <p class="book-author">{{ book.authors }}</p>
+      <p class="book-author">{{ formatAuthors }}</p>
       <div class="book-meta">
-        <span class="book-year">{{ book.years }}</span>
-        <span class="book-genre">{{ book.genres }}</span>
+        <span class="book-year">{{ formatYears }}</span>
+        <span class="book-genre">{{ formatGenres }}</span>
       </div>
       <!-- <p class="book-description">{{ truncatedDescription }}</p> -->
       <div class="book-link">
@@ -29,28 +29,41 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { bookApi } from '@/services/api'
-import type { Book } from '@/types/book'
+import type { Book } from '@/types/book' // предполагаю, что интерфейс лежит здесь
 
-interface Props {
+const props = defineProps<{
   book: Book
-}
+}>()
 
-const props = defineProps<Props>()
 const router = useRouter()
 
 const imageLoaded = ref(false)
 const imageError = ref(false)
 
-const coverUrl = computed(() => bookApi.getBookCoverUrl(props.book.id))
+const formatAuthors = computed(() => {
+  if (!props.book.authors?.length) return 'Автор неизвестен'
+  return props.book.authors.join(', ')
+})
+
+const formatYears = computed(() => {
+  if (!props.book.years?.length) return '—'
+  // если несколько годов — показываем диапазон или первый
+  if (props.book.years.length === 1) return props.book.years[0]
+  return `${Math.min(...props.book.years)} – ${Math.max(...props.book.years)}`
+})
+
+const formatGenres = computed(() => {
+  if (!props.book.genres?.length) return '—'
+  return props.book.genres.join(' • ')
+})
 
 // const truncatedDescription = computed(() => {
-//   const desc = props.book.description
+//   const desc = props.book.description ?? ''
 //   return desc.length > 100 ? desc.substring(0, 100) + '...' : desc
 // })
 
 const handleImageError = (event: Event) => {
-  console.error(`Ошибка загрузки изображения для книги ${props.book.id}:`, props.book.image_url)
+  console.error(`Ошибка загрузки обложки книги ${props.book.id}`, props.book.image_url)
   imageError.value = true
   imageLoaded.value = false
 
@@ -147,35 +160,29 @@ const goToBookDetail = () => {
 .book-author {
   color: #667eea;
   font-weight: 500;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
 }
 
 .book-meta {
   display: flex;
-  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
 
-.book-year {
+.book-year,
+.book-genre {
   background: #f0f0f0;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  color: #666;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  color: #555;
+  white-space: nowrap;
 }
 
 .book-genre {
   background: #e3f2fd;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
   color: #1976d2;
-}
-
-.book-description {
-  color: #666;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  margin-bottom: 1rem;
 }
 
 .book-link {
