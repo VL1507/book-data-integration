@@ -1,6 +1,6 @@
-from sqlalchemy import and_, exists, select, func
-from sqlalchemy.orm import aliased
+from sqlalchemy import and_, exists, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from database.models import (
     ISBN,
@@ -142,7 +142,5 @@ class BookRepository:
         result = await self.__db_session.execute(statement=stmt)
 
         books = list(result.all())
-
-        print(f"{len(books) = }")
 
         return books

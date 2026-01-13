@@ -6,7 +6,6 @@ from fastapi.responses import RedirectResponse
 from handlers import api_router
 from settings import settings
 
-
 app = FastAPI(title="Book API", description="API для книжного сайта")
 
 app.add_middleware(
