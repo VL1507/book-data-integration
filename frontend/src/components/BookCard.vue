@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Book } from '@/types/book' // предполагаю, что интерфейс лежит здесь
+import type { Book } from '@/types/book'
 
 const props = defineProps<{
   book: Book
