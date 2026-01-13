@@ -47,20 +47,15 @@ const formatAuthors = computed(() => {
 
 const formatYears = computed(() => {
   if (!props.book.years?.length) return '—'
-  // если несколько годов — показываем диапазон или первый
-  if (props.book.years.length === 1) return props.book.years[0]
-  return `${Math.min(...props.book.years)} – ${Math.max(...props.book.years)}`
+  const sortedYears = [...props.book.years].sort((a, b) => a - b)
+
+  return sortedYears.join(' • ')
 })
 
 const formatGenres = computed(() => {
   if (!props.book.genres?.length) return '—'
   return props.book.genres.join(' • ')
 })
-
-// const truncatedDescription = computed(() => {
-//   const desc = props.book.description ?? ''
-//   return desc.length > 100 ? desc.substring(0, 100) + '...' : desc
-// })
 
 const handleImageError = (event: Event) => {
   console.error(`Ошибка загрузки обложки книги ${props.book.id}`, props.book.image_url)
