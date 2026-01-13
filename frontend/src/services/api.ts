@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { Book, BookFilters } from '@/types/book'
+import type { Book, BookFilters, BookFull } from '@/types/book'
 
 // TODO: добавить путь в env
 // const API_BASE_URL = 'http://book_backend:8000'
@@ -45,13 +45,16 @@ api.interceptors.response.use(
 )
 
 export const bookApi = {
-  // Проверка здоровья API
   async healthCheck(): Promise<{ status: string; message: string }> {
     const response = await api.get('/health')
     return response.data
   },
 
-  // Получить все книги с фильтрацией
+  async pingPong(): Promise<{ ping: string }> {
+    const response = await api.get('/health')
+    return response.data
+  },
+
   async getBooks(filters: BookFilters = {}): Promise<Book[]> {
     try {
       console.log('Fetching books with filters:', filters)
@@ -73,32 +76,13 @@ export const bookApi = {
     }
   },
 
-  // Получить книгу по ID
-  async getBook(id: number): Promise<Book> {
+  async getBook(id: number): Promise<BookFull> {
     try {
       console.log(`Fetching book with id: ${id}`)
-      const response = await api.get<Book>(`/books/${id}`)
+      const response = await api.get<BookFull>(`/books/${id}`)
       return response.data
     } catch (error) {
       console.error(`Error fetching book ${id}:`, error)
-      throw error
-    }
-  },
-
-  // Получить URL обложки книги
-  getBookCoverUrl(id: number): string {
-    return `${API_BASE_URL}/books/${id}/cover`
-  },
-
-  // Получить обложку книги как Blob
-  async getBookCover(id: number): Promise<Blob> {
-    try {
-      const response = await api.get(`/books/${id}/cover`, {
-        responseType: 'blob',
-      })
-      return response.data
-    } catch (error) {
-      console.error(`Error fetching book cover ${id}:`, error)
       throw error
     }
   },
