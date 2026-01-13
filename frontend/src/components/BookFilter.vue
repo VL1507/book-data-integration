@@ -17,7 +17,7 @@
         <input
           v-model="localFilters.title"
           type="text"
-          placeholder="Введите Название..."
+          placeholder="Введите название..."
           @keyup.enter="applyFilters"
         />
       </div>
