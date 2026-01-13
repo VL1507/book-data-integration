@@ -43,4 +43,5 @@ class BookService:
             )
             for row in result
         ]
+
         return books

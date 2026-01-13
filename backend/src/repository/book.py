@@ -74,14 +74,29 @@ class BookRepository:
                 == Characteristics.publication_site_id,
             )
             .outerjoin(Genre, Genre.id == CharacteristicsGenre.genre_id)
+        )
+
+        if author:
+            author_exists = (
+                select(PublicationAuthors.publication_id)
+                .join(Authors, Authors.id == PublicationAuthors.authors_id)
+                .where(Authors.name.like(f"%{author}%"))
+                .where(PublicationAuthors.publication_id == Publication.id)
+                .exists()
+            )
+            stmt = stmt.where(author_exists)
+
+        stmt = (
+            stmt.limit(limit=limit)
+            .offset(offset=offset)
             .group_by(Publication.id)
             .order_by(Publication.id)
-            .limit(limit=limit)
-            .offset(offset=offset)
         )
 
         result = await self.__db_session.execute(statement=stmt)
 
         books = list(result.all())
+
+        print(f"{len(books) = }")
 
         return books
