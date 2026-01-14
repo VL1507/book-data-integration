@@ -1,4 +1,3 @@
-from typing import Optional
 
 from sqlalchemy import REAL, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.asyncio import AsyncAttrs
@@ -56,7 +55,7 @@ class PublishingHouses(Base):
 
     name: Mapped[str] = mapped_column(String)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    url: Mapped[Optional[str]] = mapped_column(String)
+    url: Mapped[str | None] = mapped_column(String)
 
 
 class Sites(Base):
@@ -79,7 +78,9 @@ class ISBN(Base):
 
     isbn: Mapped[str] = mapped_column(String, primary_key=True)
     publication_id: Mapped[int] = mapped_column(ForeignKey("Publication.id"))
-    publisher_id: Mapped[int] = mapped_column(ForeignKey("PublishingHouses.id"))
+    publisher_id: Mapped[int] = mapped_column(
+        ForeignKey("PublishingHouses.id")
+    )
 
 
 class Characteristics(Base):
@@ -90,11 +91,13 @@ class Characteristics(Base):
 
     year: Mapped[int] = mapped_column(Integer)
     page_count: Mapped[int] = mapped_column(Integer)
-    dim_x: Mapped[Optional[int]] = mapped_column(Integer)
-    dim_y: Mapped[Optional[int]] = mapped_column(Integer)
-    dim_z: Mapped[Optional[int]] = mapped_column(Integer)
+    dim_x: Mapped[int | None] = mapped_column(Integer)
+    dim_y: Mapped[int | None] = mapped_column(Integer)
+    dim_z: Mapped[int | None] = mapped_column(Integer)
     cover_id: Mapped[int] = mapped_column(ForeignKey("CoveragesTypes.id"))
-    illustration_id: Mapped[int] = mapped_column(ForeignKey("IllustrationTypes.id"))
+    illustration_id: Mapped[int] = mapped_column(
+        ForeignKey("IllustrationTypes.id")
+    )
 
 
 class PublicationAuthors(Base):
@@ -114,7 +117,7 @@ class PublicationSite(Base):
     site_id: Mapped[int] = mapped_column(ForeignKey("Sites.id"))
     price: Mapped[float] = mapped_column(REAL)
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    image_url: Mapped[Optional[str]] = mapped_column(String)
+    image_url: Mapped[str | None] = mapped_column(String)
 
 
 class Recension(Base):
@@ -131,7 +134,9 @@ class Annotation(Base):
     publication_site_id: Mapped[int] = mapped_column(
         ForeignKey("PublicationSite.id"), primary_key=True
     )
-    lang_id: Mapped[int] = mapped_column(ForeignKey("Language.id"), primary_key=True)
+    lang_id: Mapped[int] = mapped_column(
+        ForeignKey("Language.id"), primary_key=True
+    )
     description: Mapped[str] = mapped_column(Text)
 
 

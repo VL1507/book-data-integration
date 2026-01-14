@@ -1,13 +1,11 @@
-from sqlalchemy import and_, distinct, func, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import (
     ISBN,
-    AdditionalCharacteristics,
     Annotation,
     Authors,
     Characteristics,
-    CharacteristicsAdditional,
     CharacteristicsGenre,
     CoveragesTypes,
     Genre,
@@ -17,7 +15,6 @@ from database.models import (
     PublicationAuthors,
     PublicationSite,
     PublishingHouses,
-    Recension,
     Sites,
 )
 
@@ -31,21 +28,18 @@ class BookRepository:
             select(
                 Publication.id.label("publication_id"),
                 Publication.name.label("title"),
-                func.aggregate_strings(Authors.name.distinct(), separator=",").label(
-                    "authors"
-                ),
-                func.aggregate_strings(Genre.genre.distinct(), separator=",").label(
-                    "genres"
-                ),
+                func.aggregate_strings(
+                    Authors.name.distinct(), separator=","
+                ).label("authors"),
+                func.aggregate_strings(
+                    Genre.genre.distinct(), separator=","
+                ).label("genres"),
                 func.aggregate_strings(
                     Annotation.description.distinct(), separator=","
                 ).label("annotations"),
-                func.aggregate_strings(ISBN.isbn.distinct(), separator=",").label(
-                    "isbn"
-                ),
-                #
-                #
-                #
+                func.aggregate_strings(
+                    ISBN.isbn.distinct(), separator=","
+                ).label("isbn"),
                 Characteristics.year,
                 Characteristics.page_count,
                 PublicationSite.price,
@@ -54,9 +48,9 @@ class BookRepository:
                 Sites.url.label("site_url"),
                 IllustrationTypes.name.label("illustration_type"),
                 CoveragesTypes.name.label("coverages_type"),
-                func.aggregate_strings(Language.lang.distinct(), separator=",").label(
-                    "languages"
-                ),
+                func.aggregate_strings(
+                    Language.lang.distinct(), separator=","
+                ).label("languages"),
                 Characteristics.dim_x,
                 Characteristics.dim_y,
                 Characteristics.dim_z,
@@ -69,7 +63,9 @@ class BookRepository:
             )
             .join(ISBN, ISBN.publication_id == Publication.id, isouter=True)
             .join(
-                PublishingHouses, PublishingHouses.id == ISBN.publisher_id, isouter=True
+                PublishingHouses,
+                PublishingHouses.id == ISBN.publisher_id,
+                isouter=True,
             )
             .join(
                 PublicationAuthors,
@@ -105,7 +101,9 @@ class BookRepository:
                 == Characteristics.publication_site_id,
                 isouter=True,
             )
-            .join(Genre, Genre.id == CharacteristicsGenre.genre_id, isouter=True)
+            .join(
+                Genre, Genre.id == CharacteristicsGenre.genre_id, isouter=True
+            )
             .where(Publication.id == publication_id)
             .group_by(PublicationSite.id)
         )
@@ -133,22 +131,24 @@ class BookRepository:
                 func.aggregate_strings(
                     Characteristics.year.distinct(), separator=","
                 ).label("years"),
-                func.aggregate_strings(Authors.name.distinct(), separator=",").label(
-                    "authors"
-                ),
+                func.aggregate_strings(
+                    Authors.name.distinct(), separator=","
+                ).label("authors"),
                 func.coalesce(
-                    func.aggregate_strings(Genre.genre.distinct(), separator=",").label(
-                        "genres"
-                    ),
+                    func.aggregate_strings(
+                        Genre.genre.distinct(), separator=","
+                    ).label("genres"),
                     "",
                 ),
             )
             .outerjoin(
-                PublicationAuthors, PublicationAuthors.publication_id == Publication.id
+                PublicationAuthors,
+                PublicationAuthors.publication_id == Publication.id,
             )
             .outerjoin(Authors, Authors.id == PublicationAuthors.authors_id)
             .outerjoin(
-                PublicationSite, PublicationSite.publication_id == Publication.id
+                PublicationSite,
+                PublicationSite.publication_id == Publication.id,
             )
             .outerjoin(
                 Characteristics,
@@ -191,7 +191,8 @@ class BookRepository:
                 .where(
                     and_(
                         Genre.genre.ilike(f"%{genre}%"),
-                        Characteristics.publication_site_id == PublicationSite.id,
+                        Characteristics.publication_site_id
+                        == PublicationSite.id,
                         PublicationSite.publication_id == Publication.id,
                     )
                 )

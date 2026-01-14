@@ -12,7 +12,9 @@ async def get_book_by_publication_id(
     book_service: BookService = Depends(get_book_service),
 ):
     print(publication_id)
-    book = await book_service.get_book_by_publication_id(publication_id=publication_id)
+    book = await book_service.get_book_by_publication_id(
+        publication_id=publication_id
+    )
     if book is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -26,7 +28,9 @@ async def get_books(
     title: str | None = Query(None, description="Фильтр по названию книги"),
     genre: str | None = Query(None, description="Фильтр по жанру"),
     author: str | None = Query(None, description="Фильтр по автору"),
-    year_from: int | None = Query(None, description="Год от", ge=1000, le=2100),
+    year_from: int | None = Query(
+        None, description="Год от", ge=1000, le=2100
+    ),
     year_to: int | None = Query(None, description="Год до", ge=1000, le=2100),
     limit: int = Query(10, description="Лимит результатов", ge=1, le=100),
     offset: int = Query(0, description="Смещение", ge=0),

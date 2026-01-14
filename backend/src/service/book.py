@@ -6,7 +6,9 @@ class BookService:
     def __init__(self, book_repository: BookRepository):
         self.__book_repository = book_repository
 
-    async def get_book_by_publication_id(self, publication_id: str) -> BookFull:
+    async def get_book_by_publication_id(
+        self, publication_id: str
+    ) -> BookFull:
         result = await self.__book_repository.get_book_by_publication_id(
             publication_id=publication_id
         )
@@ -36,8 +38,7 @@ class BookService:
 
             genre = row_mapping.get("genres")
             if genre is not None:
-                for g in genre.split(","):
-                    genres.add(g)
+                genres.update(genre.split(","))
 
             ann = row_mapping.get("annotations")
             if ann is not None:
