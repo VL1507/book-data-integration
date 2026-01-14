@@ -1,3 +1,9 @@
+.git/
+.git
+Dockerfile
+nginx.conf
+
+
 # BACKEND
 
 # Byte-compiled / optimized / DLL files

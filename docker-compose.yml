@@ -12,24 +12,35 @@ services:
       DB__PORT: 3306
       DB__NAME: app
       APP__PORT: 8000
-      APP__FRONTEND_URL: http://frontend:5173
+      APP__FRONTEND_URL: http://frontend:80
     depends_on:
       my-mysql:
         condition: service_healthy
 
-  frontend:
-    profiles: [ "site" ]
+  # frontend:
+  #   profiles: [ "site" ]
+  #   container_name: frontend
+  #   build: ./frontend/
+  #   ports:
+  #     - "5173:5173"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #   environment:
+  #     CHOKIDAR_USEPOLLING: true
+  #     WATCHPACK_POLLING: true
+  #     VITE_BACKEND_URL: http://backend:8000
+
+  frontend:               # ← теперь это nginx + статика
+    profiles: ["site"]
     container_name: frontend
-    build: ./frontend/
+    build:
+      context: ./frontend
+      target: production   # или просто убрать target, если Dockerfile заканчивается на production-stage
     ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      CHOKIDAR_USEPOLLING: true
-      WATCHPACK_POLLING: true
-      VITE_BACKEND_URL: http://backend:8000
+      - "80:80"            # или 8080:80, 443:443 и т.д.
+    depends_on:
+      - backend
 
   my-mysql:
     image: mysql:8.0.16
@@ -101,3 +112,4 @@ services:
 
 volumes:
   mysql_data:
+  frontend-dist:
