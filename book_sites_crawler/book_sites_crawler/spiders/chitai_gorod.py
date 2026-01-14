@@ -1,4 +1,5 @@
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
 from scrapy import Spider
 from scrapy.http import Response
@@ -16,13 +17,10 @@ class ChitaiGorodSpider(Spider):
         "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
         "CONCURRENT_REQUESTS": 16,
         "CONCURRENT_REQUESTS_PER_DOMAIN": 8,
-        #
         "DOWNLOAD_DELAY": 0.5,
         "RANDOMIZE_DOWNLOAD_DELAY": True,
         "DOWNLOAD_TIMEOUT": 30,
-        #
         "HTTPCACHE_ENABLED": True,
-        #
         "LOG_LEVEL": "INFO",
     }
     page_count_limit = 20
@@ -38,7 +36,9 @@ class ChitaiGorodSpider(Spider):
         for book_link in book_links:
             yield response.follow(book_link, callback=self.parse_book_detail)
 
-        next_page = response.css("div.app-catalog__pagination a::attr(href)").get()
+        next_page = response.css(
+            "div.app-catalog__pagination a::attr(href)"
+        ).get()
         if next_page:
             if self.page_count >= self.page_count_limit:
                 return
@@ -47,24 +47,28 @@ class ChitaiGorodSpider(Spider):
 
     def parse_book_detail(
         self, response: Response
-    ) -> Generator[BookSitesCrawlerItem, Any, None]:
+    ) -> Generator[BookSitesCrawlerItem, Any]:
         self.logger.info(response.url)
 
         item = BookSitesCrawlerItem()
 
         characteristics = response.css("div#description")
 
-        item["isbn"] = list(
-            map(
-                lambda isbn: isbn.replace("-", "").strip(),
-                characteristics.css('span[itemprop="isbn"] span::text').getall(),
-            )
-        )
+        item["isbn"] = [
+            isbn.replace("-", "").strip()
+            for isbn in characteristics.css(
+                'span[itemprop="isbn"] span::text'
+            ).getall()
+        ]
 
-        if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
+        if len(item["isbn"]) == 0 or (
+            len(item["isbn"]) == 1 and not item["isbn"][0]
+        ):
             return
 
-        year = characteristics.css('span[itemprop="datePublished"] span::text').get()
+        year = characteristics.css(
+            'span[itemprop="datePublished"] span::text'
+        ).get()
         if year is not None and year.isdigit():
             year = int(year)
         item["year"] = year
@@ -101,14 +105,16 @@ class ChitaiGorodSpider(Spider):
             item["dim_y"] = dim_y
             item["dim_z"] = dim_z
 
-        item["books_name"] = response.css("h1.product-detail-page__title::text").get()
+        item["books_name"] = response.css(
+            "h1.product-detail-page__title::text"
+        ).get()
 
-        item["authors_name"] = list(
-            map(
-                lambda author_name: author_name.replace(",", "").strip(),
-                response.css("ul.product-authors a::text").getall(),
-            )
-        )
+        item["authors_name"] = [
+            author_name.replace(",", "").strip()
+            for author_name in response.css(
+                "ul.product-authors a::text"
+            ).getall()
+        ]
 
         item["genre"] = characteristics.css(
             'span[itemprop="comicGenres"] a::text'
@@ -118,9 +124,13 @@ class ChitaiGorodSpider(Spider):
         item["sites_url"] = self.allowed_domains[0]
 
         # PublicationSite
-        current_price = response.css("span.product-offer-price__actual::text").get()
+        current_price = response.css(
+            "span.product-offer-price__actual::text"
+        ).get()
         if current_price:
-            current_price = current_price.replace("\xa0", "").replace("₽", "").strip()
+            current_price = (
+                current_price.replace("\xa0", "").replace("₽", "").strip()
+            )
         item["publication_site_price"] = current_price
 
         # Language # TODO: на сайте не указывается язык
@@ -130,7 +140,9 @@ class ChitaiGorodSpider(Spider):
         full_text = characteristics.css(
             "article.product-detail-page__detail-text::text"
         ).getall()
-        item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
+        item["description"] = " ".join(
+            [t.strip() for t in full_text if t.strip()]
+        )
 
         item["publishing_houses_name"] = characteristics.css(
             'span[itemprop="publisher"] a::text'
@@ -140,7 +152,9 @@ class ChitaiGorodSpider(Spider):
             'span[itemprop="publisher"] a::attr(href)'
         ).get()
         if publishing_houses_url:
-            item["publishing_houses_url"] = response.urljoin(publishing_houses_url)
+            item["publishing_houses_url"] = response.urljoin(
+                publishing_houses_url
+            )
         else:
             item["publishing_houses_url"] = None
 

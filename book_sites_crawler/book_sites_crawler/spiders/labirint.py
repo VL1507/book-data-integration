@@ -1,4 +1,5 @@
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
 from scrapy import Spider
 from scrapy.http import Response
@@ -19,13 +20,10 @@ class LabirintSpider(Spider):
         "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
         "CONCURRENT_REQUESTS": 16,
         "CONCURRENT_REQUESTS_PER_DOMAIN": 8,
-        #
         "DOWNLOAD_DELAY": 0.5,
         "RANDOMIZE_DOWNLOAD_DELAY": True,
         "DOWNLOAD_TIMEOUT": 30,
-        #
         "HTTPCACHE_ENABLED": True,
-        #
         "LOG_LEVEL": "INFO",
     }
     page_count_limit = 40
@@ -40,7 +38,9 @@ class LabirintSpider(Spider):
 
         for book_link in book_links:
             if book_link and "/books/" in book_link:
-                yield response.follow(book_link, callback=self.parse_book_detail)
+                yield response.follow(
+                    book_link, callback=self.parse_book_detail
+                )
 
         next_page = response.css("a.pagination-next__text::attr(href)").get()
         if next_page:
@@ -51,7 +51,7 @@ class LabirintSpider(Spider):
 
     def parse_book_detail(
         self, response: Response
-    ) -> Generator[BookSitesCrawlerItem, Any, None]:
+    ) -> Generator[BookSitesCrawlerItem, Any]:
         self.logger.info(response.url)
 
         characteristics = response.css("div#сharacteristics")
@@ -71,7 +71,9 @@ class LabirintSpider(Spider):
             )
         )
 
-        if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
+        if len(item["isbn"]) == 0 or (
+            len(item["isbn"]) == 1 and item["isbn"][0] == ""
+        ):
             return
 
         year = characteristics.css(
@@ -145,7 +147,9 @@ class LabirintSpider(Spider):
         full_text = response.xpath(
             '//*[@id="annotation"]/div[2]/div/div[1]/div[1]//text()'
         ).getall()
-        item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
+        item["description"] = " ".join(
+            [t.strip() for t in full_text if t.strip()]
+        )
 
         item["publishing_houses_name"] = characteristics.css(
             'div._name_mmfyx_9:contains("Издательство") + div a::text'

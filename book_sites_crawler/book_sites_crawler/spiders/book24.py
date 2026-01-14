@@ -1,4 +1,5 @@
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
 from scrapy import Spider
 from scrapy.http import Response
@@ -11,21 +12,23 @@ class Book24Spider(Spider):
     allowed_domains = ["book24.ru"]
     start_urls = [
         # "https://book24.ru/catalog/",
-        "https://book24.ru/catalog/fiction-1592/",
+        # "https://book24.ru/catalog/fiction-1592/",
+        "https://book24.ru/catalog/samoobrazovanie-i-razvitie-4560/",
+        "https://book24.ru/catalog/detektivy-1594/",
+        "https://book24.ru/catalog/boeviki-trillery-1715/",
+        "https://book24.ru/catalog/fantastika-1649/",
+        "https://book24.ru/catalog/uzhasy-i-mistika-2054/",
     ]
 
     custom_settings = {
         "ROBOTSTXT_OBEY": False,
         "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0",
-        "CONCURRENT_REQUESTS": 16,
-        "CONCURRENT_REQUESTS_PER_DOMAIN": 8,
-        #
+        "CONCURRENT_REQUESTS": 160,
+        "CONCURRENT_REQUESTS_PER_DOMAIN": 80,
         "DOWNLOAD_DELAY": 0.5,
         "RANDOMIZE_DOWNLOAD_DELAY": True,
         "DOWNLOAD_TIMEOUT": 30,
-        #
         "HTTPCACHE_ENABLED": True,
-        #
         "LOG_LEVEL": "INFO",
     }
     page_count_limit = 40
@@ -52,7 +55,7 @@ class Book24Spider(Spider):
 
     def parse_book_detail(
         self, response: Response
-    ) -> Generator[BookSitesCrawlerItem, Any, None]:
+    ) -> Generator[BookSitesCrawlerItem, Any]:
         self.logger.info(response.url)
 
         item = BookSitesCrawlerItem()
@@ -71,23 +74,23 @@ class Book24Spider(Spider):
             )
         )
 
-        if len(item["isbn"]) == 0 or (len(item["isbn"]) == 1 and item["isbn"][0] == ""):
+        if len(item["isbn"]) == 0 or (
+            len(item["isbn"]) == 1 and not item["isbn"][0]
+        ):
             return
 
         year = characteristics.xpath(
             './/span[contains(., "Год издания")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
         ).get()
-        if year is not None:
-            if year.strip().isdigit():
-                year = int(year.strip())
+        if year is not None and year.strip().isdigit():
+            year = int(year.strip())
         item["year"] = year
 
         page_count = characteristics.xpath(
             './/span[contains(., " Количество страниц: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
         ).get()
-        if page_count is not None:
-            if page_count.strip().isdigit():
-                page_count = int(page_count.strip())
+        if page_count is not None and page_count.strip().isdigit():
+            page_count = int(page_count.strip())
 
         item["page_count"] = page_count
 
@@ -142,7 +145,9 @@ class Book24Spider(Spider):
             "span.app-price.product-sidebar-price__price::text"
         ).get()
         if current_price:
-            current_price = current_price.replace("\xa0", "").replace("₽", "").strip()
+            current_price = (
+                current_price.replace("\xa0", "").replace("₽", "").strip()
+            )
         item["publication_site_price"] = current_price
 
         # # Language # TODO: на сайте не указывается язык
@@ -152,7 +157,9 @@ class Book24Spider(Spider):
         full_text = response.css(
             "div#product-about div.product-about__additional p::text"
         ).getall()
-        item["description"] = " ".join([t.strip() for t in full_text if t.strip()])
+        item["description"] = " ".join(
+            [t.strip() for t in full_text if t.strip()]
+        )
 
         item["publishing_houses_name"] = characteristics.xpath(
             './/span[contains(., " Издательство: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/text()'
@@ -162,7 +169,9 @@ class Book24Spider(Spider):
             './/span[contains(., " Издательство: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/a/@href'
         ).get()
         if publishing_houses_url:
-            item["publishing_houses_url"] = "https://book24.ru" + publishing_houses_url
+            item["publishing_houses_url"] = (
+                "https://book24.ru" + publishing_houses_url
+            )
         else:
             item["publishing_houses_url"] = None
 
