@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,4 +13,4 @@ LOGGING_LEVEL = os.getenv("LOGGING_LEVEL")
 JSON_PATH_BOOK24 = Path(r"./results/book24.json")
 JSON_PATH_CHITAI_GOROD = Path(r"./results/chitai-gorod.json")
 JSON_PATH_LABIRINT = Path(r"./results/labirint.json")
-print(DATABASE_URL)
+# print(DATABASE_URL)

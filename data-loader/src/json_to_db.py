@@ -1,43 +1,39 @@
 import json
-from pathlib import Path
+import logging
 import shutil
-import time
 import sys
+import time
+from pathlib import Path
 
 from sqlalchemy import select
 
 from db_conn import Session
-from wrap_timer import timer
-
 from json_model import BookSitesCrawlerItem
 from models import (
-    Sites,
-    AdditionalCharacteristics,
+    ISBN,
     Annotation,
     Authors,
-    PublicationAuthors,
-    CharacteristicsAdditional,
-    PublishingHouses,
-    Language,
     Characteristics,
     CharacteristicsGenre,
     CoveragesTypes,
     Genre,
     IllustrationTypes,
-    PublicationSite,
+    Language,
     Publication,
+    PublicationAuthors,
+    PublicationSite,
+    PublishingHouses,
     Recension,
-    ISBN,
+    Sites,
 )
-
-import logging
+from wrap_timer import timer
 
 logger = logging.getLogger(name=__name__)
 
 
 @timer
 def load_from_json(path: Path) -> list[BookSitesCrawlerItem]:
-    with open(file=path, mode="r", encoding="utf-8") as f:
+    with Path(path).open(encoding="utf-8") as f:
         data = json.load(f)
 
     items = []
@@ -119,9 +115,13 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                 logger.debug("continue - len(book_item.authors_name) == 0")
                 continue
             if book_item.publishing_houses_name is None:
-                data_show.add("continue - book_item.publishing_houses_name is None")
+                data_show.add(
+                    "continue - book_item.publishing_houses_name is None"
+                )
                 data_show.reprint()
-                logger.debug("continue - book_item.publishing_houses_name is None")
+                logger.debug(
+                    "continue - book_item.publishing_houses_name is None"
+                )
                 continue
             if len(book_item.isbn) == 0:
                 data_show.add("continue - len(book_item.isbn) == 0")
@@ -129,9 +129,13 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                 logger.debug("continue - len(book_item.isbn) == 0")
                 continue
             if book_item.publication_site_price is None:
-                data_show.add("continue - book_item.publication_site_price is None")
+                data_show.add(
+                    "continue - book_item.publication_site_price is None"
+                )
                 data_show.reprint()
-                logger.debug("continue - book_item.publication_site_price is None")
+                logger.debug(
+                    "continue - book_item.publication_site_price is None"
+                )
                 continue
             if book_item.year is None:
                 data_show.add("continue - book_item.year is None")
@@ -149,7 +153,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             publication = publication_cache.get(publication_key)
             if publication is None:
                 publication = session.scalar(
-                    select(Publication).where(Publication.name == book_item.books_name)
+                    select(Publication).where(
+                        Publication.name == book_item.books_name
+                    )
                 )
                 if publication is None:
                     publication = Publication(name=book_item.books_name)
@@ -160,12 +166,15 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # Recension
             recension = session.scalar(
-                select(Recension).where(Recension.publication_id == publication.id)
+                select(Recension).where(
+                    Recension.publication_id == publication.id
+                )
             )
             if recension is None:
                 if book_item.recension_link is not None:
                     recension = Recension(
-                        publication_id=publication.id, link=book_item.recension_link
+                        publication_id=publication.id,
+                        link=book_item.recension_link,
                     )
                     session.add(Recension)
 
@@ -231,8 +240,10 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             if publishing_house is None:
                 publishing_house = session.scalar(
                     select(PublishingHouses).where(
-                        PublishingHouses.name == book_item.publishing_houses_name,
-                        PublishingHouses.url == book_item.publishing_houses_url,
+                        PublishingHouses.name
+                        == book_item.publishing_houses_name,
+                        PublishingHouses.url
+                        == book_item.publishing_houses_url,
                     )
                 )
                 if publishing_house is None:
@@ -248,7 +259,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             # ISBN
 
             for book_isbn in book_item.isbn:
-                isbn = session.scalar(select(ISBN).where(ISBN.isbn == book_isbn))
+                isbn = session.scalar(
+                    select(ISBN).where(ISBN.isbn == book_isbn)
+                )
                 if isbn is None:
                     isbn = ISBN(
                         isbn=book_isbn,
@@ -270,7 +283,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                     )
                 )
                 if site is None:
-                    site = Sites(site=book_item.sites_site, url=book_item.sites_url)
+                    site = Sites(
+                        site=book_item.sites_site, url=book_item.sites_url
+                    )
                     session.add(site)
                 sites_cache[site_key] = site
 
@@ -290,7 +305,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             # Annotation
             if book_item.description is None:
-                logger.debug("continue - book_item.publication_site_price is None")
+                logger.debug(
+                    "continue - book_item.publication_site_price is None"
+                )
                 # continue
             else:
                 annotation = Annotation(
@@ -309,11 +326,14 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                 coverages_types = None
             else:
                 coverages_types_key = book_item.coverages_types_name
-                coverages_types = coverages_types_cache.get(coverages_types_key)
+                coverages_types = coverages_types_cache.get(
+                    coverages_types_key
+                )
                 if coverages_types is None:
                     coverages_types = session.scalar(
                         select(CoveragesTypes).where(
-                            CoveragesTypes.name == book_item.coverages_types_name
+                            CoveragesTypes.name
+                            == book_item.coverages_types_name
                         )
                     )
                     if coverages_types is None:
@@ -321,7 +341,9 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                             name=book_item.coverages_types_name
                         )
                         session.add(coverages_types)
-                    coverages_types_cache[coverages_types_key] = coverages_types
+                    coverages_types_cache[coverages_types_key] = (
+                        coverages_types
+                    )
 
             session.flush()
 
@@ -339,7 +361,8 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
                 if illustration_types is None:
                     illustration_types = session.scalar(
                         select(IllustrationTypes).where(
-                            IllustrationTypes.name == book_item.illustration_types_name
+                            IllustrationTypes.name
+                            == book_item.illustration_types_name
                         )
                     )
                     if illustration_types is None:
