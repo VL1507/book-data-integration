@@ -1,6 +1,5 @@
-import re
 
-from sqlalchemy import text, bindparam
+from sqlalchemy import bindparam, text
 from sqlalchemy.exc import OperationalError
 from tqdm import tqdm
 
@@ -8,12 +7,11 @@ from tqdm import tqdm
 def union_group(session, group: list[int]):
     if len(group) <= 1:
         return
-    pub_id = bindparam('pub_id', value=group[0])
-    ids = bindparam('ids', value=group[1:], expanding=True)
-    def exceq_query(query, binds = [pub_id, ids]):
-        query = text(query).bindparams(
-            *binds
-        )
+    pub_id = bindparam("pub_id", value=group[0])
+    ids = bindparam("ids", value=group[1:], expanding=True)
+
+    def exceq_query(query, binds=[pub_id, ids]):
+        query = text(query).bindparams(*binds)
         try:
             session.execute(query)
         except OperationalError as oe:
@@ -21,7 +19,7 @@ def union_group(session, group: list[int]):
             print(f"Error: {oe}")
             return False
 
-    ## Добавление новых авторов и удаление у старых
+    # Добавление новых авторов и удаление у старых
     exceq_query(
         """
             UPDATE PublicationAuthors pa
@@ -37,10 +35,10 @@ def union_group(session, group: list[int]):
         """
             DELETE FROM PublicationAuthors WHERE PublicationAuthors.publication_id IN :ids;
         """,
-        [ids]
+        [ids],
     )
 
-    ## Изменение привязки Recension
+    # Изменение привязки Recension
     exceq_query(
         """
             UPDATE Recension
@@ -49,7 +47,7 @@ def union_group(session, group: list[int]):
         """
     )
 
-    ## Изменение привязки ISBN
+    # Изменение привязки ISBN
     exceq_query(
         """
             UPDATE ISBN
@@ -58,7 +56,7 @@ def union_group(session, group: list[int]):
         """
     )
 
-    ## Изменение привязки PublicationSite
+    # Изменение привязки PublicationSite
     exceq_query(
         """
             UPDATE PublicationSite
@@ -67,24 +65,25 @@ def union_group(session, group: list[int]):
         """
     )
 
-    ## Удаление дублирующихся Publication
+    # Удаление дублирующихся Publication
     exceq_query(
         """
             DELETE FROM Publication WHERE Publication.id IN :ids;
         """,
-        [ids]
+        [ids],
     )
 
 
 def process_books_groups(session) -> bool:
-    '''
+    """
     Функция группировки книг по названию
     :param session: SQLAlchemy активная сессия базы данных
     :return: Результат работы функции
-    '''
+    """
     try:
-        result = session.execute(text(
-        """
+        result = session.execute(
+            text(
+                """
         WITH cte AS (
             SELECT 
                 DENSE_RANK() OVER (ORDER BY metaphone) AS mphone_id,
@@ -98,14 +97,15 @@ def process_books_groups(session) -> bool:
         GROUP BY mphone_id
         ORDER BY mphone_id;
         """
-            ))
+            )
+        )
         groups = result.fetchall()
     except OperationalError as oe:
         session.rollback()
         print(f"Error: {oe}")
         return False
 
-    groups = [list(map(int, x[0].split(','))) for x in groups]
+    groups = [list(map(int, x[0].split(","))) for x in groups]
 
     for t, group in tqdm(enumerate(groups)):
         union_group(session, group)

@@ -6,37 +6,49 @@ from tqdm import tqdm
 
 
 def process_word(word):
-    '''
+    """
     Очищает слово от "мусора"
 
     :param word: Слово, которое необходимо преобразовать
     :return: Очищенная версия слова
-    '''
-    bad_words = ['Манга', 'Новелла', 'Манхва', 'Подарочное издание', 'Официальный мерч', 'Тату', 'Роман', 'Артбук', 'Сборник', 'Повесть', 'Дунхуа']
+    """
+    bad_words = [
+        "Манга",
+        "Новелла",
+        "Манхва",
+        "Подарочное издание",
+        "Официальный мерч",
+        "Тату",
+        "Роман",
+        "Артбук",
+        "Сборник",
+        "Повесть",
+        "Дунхуа",
+    ]
     bad_words.extend([x.lower() for x in bad_words])
-    bad_symbols = ['"', "'", '«', '»']
-    word = re.sub(r'\(#([1-9])\)', lambda m: f'№{m.group(1)}', word)
-    word = re.sub(r'\((?!Не\))(?!не\))[^)]*\)', '', word)
-    word = re.sub(r'#[^ ]*', '', word)
-    word = re.sub(r'\+[^$]*', '', word)
+    bad_symbols = ['"', "'", "«", "»"]
+    word = re.sub(r"\(#([1-9])\)", lambda m: f"№{m.group(1)}", word)
+    word = re.sub(r"\((?!Не\))(?!не\))[^)]*\)", "", word)
+    word = re.sub(r"#[^ ]*", "", word)
+    word = re.sub(r"\+[^$]*", "", word)
     for b in bad_words:
-        pattern = f'(?<![А-яA-z]){b}(?![А-яA-z])'
-        word = re.sub(pattern, '', word)
+        pattern = f"(?<![А-яA-z]){b}(?![А-яA-z])"
+        word = re.sub(pattern, "", word)
     for b in bad_symbols:
-        word = word.replace(b, '')
-    while '..' in word or '  ' in word or ' .' in word:
-        word = re.sub(r'\s{2,}', ' ', word)
-        word = re.sub(r'(\s\.)|(\.{2,})', '.', word)
-    word = word.strip(' .,|:;-[]')
+        word = word.replace(b, "")
+    while ".." in word or "  " in word or " ." in word:
+        word = re.sub(r"\s{2,}", " ", word)
+        word = re.sub(r"(\s\.)|(\.{2,})", ".", word)
+    word = word.strip(" .,|:;-[]")
     return word
 
 
 def process_books_name(session) -> bool:
-    '''
+    """
     Функция преобразования названия книг в их очищенную версию
     :param session: SQLAlchemy активная сессия базы данных
     :return: Результат работы функции
-    '''
+    """
     try:
         result = session.execute(text("SELECT id, name FROM Publication"))
         rows = result.fetchall()
@@ -50,15 +62,15 @@ def process_books_name(session) -> bool:
     for t, row in tqdm(enumerate(rows)):
         pub_id, name = row
         try:
-            session.execute(text("""
+            session.execute(
+                text("""
                                 UPDATE Publication 
                                 SET name = :name 
                                 WHERE id = :pub_id
-                            """), {
-                'name': process_word(name),
-                'pub_id': pub_id
-            })
-        except OperationalError as oe:
+                            """),
+                {"name": process_word(name), "pub_id": pub_id},
+            )
+        except OperationalError:
             continue
         if t % batch_size == 0:
             session.commit()
