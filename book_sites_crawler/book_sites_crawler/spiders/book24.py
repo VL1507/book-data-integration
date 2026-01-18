@@ -62,17 +62,12 @@ class Book24Spider(Spider):
 
         characteristics = response.css("#product-characteristic > dl")
 
-        item["isbn"] = list(
-            map(
-                lambda isbn: isbn.replace("-", ""),
-                (
+        item["isbn"] = [isbn.replace("-", "") for isbn in (
                     characteristics.css("button.isbn-product::text")
                     .get(default="")
                     .strip()
                     .split(", ")
-                ),
-            )
-        )
+                )]
 
         if len(item["isbn"]) == 0 or (
             len(item["isbn"]) == 1 and not item["isbn"][0]
@@ -103,7 +98,7 @@ class Book24Spider(Spider):
             item["dim_z"] = None
         else:
             dim_split = dim.strip().split()[0].split("x")
-            dim_split.extend([None, None, None])  # type: ignore
+            dim_split.extend([None, None, None])  # type: ignore  # noqa: PGH003
 
             dim_x = dim_split[0]
             if dim_x is not None and dim_x.isdigit():
@@ -175,14 +170,6 @@ class Book24Spider(Spider):
         else:
             item["publishing_houses_url"] = None
 
-        # # Recension
-        # # item["recension_link"] = ...
-
-        # # IllustrationTypes
-        # item["illustration_types_name"] = characteristics.css(
-        #     'div._name_mmfyx_9:contains("Иллюстрации") ~ div.text-black span::text'
-        # ).get()
-
         # # CoveragesTypes
         coverages_types_name = characteristics.xpath(
             './/span[contains(., " Переплет: ")]/ancestor::dt/following-sibling::dd[@class="product-characteristic__value"]/text()'
@@ -191,12 +178,6 @@ class Book24Spider(Spider):
             item["coverages_types_name"] = coverages_types_name.strip()
         else:
             item["coverages_types_name"] = None
-
-        # # AdditionalCharacteristics # TODO: что это и зачем
-        # # item["additional_characteristics_name"] = ...
-        # # CharacteristicsToAdditional
-        # # item["characteristics_to_additional_value"] = ...
-        # # item["additional_characteristics"] = ...
 
         image_url = response.xpath(
             '//div[@class="product-poster__main-slide"][1]//source/@srcset'

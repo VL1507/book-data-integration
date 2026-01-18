@@ -58,18 +58,13 @@ class LabirintSpider(Spider):
 
         item = BookSitesCrawlerItem()
 
-        item["isbn"] = list(
-            map(
-                lambda isbn: isbn.replace("-", ""),
-                (
+        item["isbn"] = [isbn.replace("-", "") for isbn in (
                     characteristics.css(
                         'div._feature_mmfyx_1 div._name_mmfyx_9:contains("ISBN") ~ div.text-black span::text'
                     )
                     .get(default="")
                     .split(", ")
-                ),
-            )
-        )
+                )]
 
         if len(item["isbn"]) == 0 or (
             len(item["isbn"]) == 1 and item["isbn"][0] == ""
@@ -99,7 +94,7 @@ class LabirintSpider(Spider):
             item["dim_z"] = None
         else:
             dim_split = dim.split("x")
-            dim_split.extend([None, None, None])  # type: ignore
+            dim_split.extend([None, None, None])  # type: ignore  # noqa: PGH003
 
             dim_x = dim_split[0]
             if dim_x is not None and dim_x.isdigit():
@@ -159,9 +154,6 @@ class LabirintSpider(Spider):
             'div._name_mmfyx_9:contains("Издательство") + div a::attr(href)'
         ).get()
 
-        # Recension
-        # item["recension_link"] = ...
-
         # IllustrationTypes
         item["illustration_types_name"] = characteristics.css(
             'div._name_mmfyx_9:contains("Иллюстрации") ~ div.text-black span::text'
@@ -171,12 +163,6 @@ class LabirintSpider(Spider):
         item["coverages_types_name"] = characteristics.css(
             'div._name_mmfyx_9:contains("Тип обложки") ~ div.text-black span::text'
         ).get()
-
-        # AdditionalCharacteristics # TODO: что это и зачем
-        # item["additional_characteristics_name"] = ...
-        # CharacteristicsToAdditional
-        # item["characteristics_to_additional_value"] = ...
-        # item["additional_characteristics"] = ...
 
         labirint_book_id = response.url.split("/")[-2]
         item["image_urls"] = (

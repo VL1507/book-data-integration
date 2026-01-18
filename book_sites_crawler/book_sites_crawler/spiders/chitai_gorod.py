@@ -87,7 +87,7 @@ class ChitaiGorodSpider(Spider):
             item["dim_z"] = None
         else:
             dim_split = dim.replace(".", "").strip().split("x")
-            dim_split.extend([None, None, None])  # type: ignore
+            dim_split.extend([None, None, None])  # type: ignore  # noqa: PGH003
 
             dim_x = dim_split[0]
             if dim_x is not None and dim_x.isdigit():
@@ -158,9 +158,6 @@ class ChitaiGorodSpider(Spider):
         else:
             item["publishing_houses_url"] = None
 
-        # Recension
-        # item["recension_link"] = ...
-
         # IllustrationTypes # TODO: нет такой характеристики на сайте
         item["illustration_types_name"] = None
 
@@ -172,12 +169,6 @@ class ChitaiGorodSpider(Spider):
             item["coverages_types_name"] = coverages_types_name.strip()
         else:
             item["coverages_types_name"] = None
-
-        # AdditionalCharacteristics # TODO: что это и зачем
-        # item["additional_characteristics_name"] = ...
-        # CharacteristicsToAdditional
-        # item["characteristics_to_additional_value"] = ...
-        # item["additional_characteristics"] = ...
 
         item["image_urls"] = response.css(
             'meta[property="og:image"]::attr(content)'
