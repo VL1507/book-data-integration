@@ -31,14 +31,14 @@ services:
   #     WATCHPACK_POLLING: true
   #     VITE_BACKEND_URL: http://backend:8000
 
-  frontend:               # ← теперь это nginx + статика
-    profiles: ["site"]
+  frontend:
+    profiles: [ "site" ]
     container_name: frontend
     build:
       context: ./frontend
-      target: production   # или просто убрать target, если Dockerfile заканчивается на production-stage
+      target: production
     ports:
-      - "80:80"            # или 8080:80, 443:443 и т.д.
+      - "80:80"
     depends_on:
       - backend
 
@@ -54,7 +54,7 @@ services:
       - ./init-db:/docker-entrypoint-initdb.d/
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysql", "-uroot", "-p${DATA_MYSQL_PASSWORD}", "-e", "USE app; SELECT 1;"]
+      test: [ "CMD", "mysql", "-uroot", "-p${DATA_MYSQL_PASSWORD}", "-e", "USE app; SELECT 1;" ]
       timeout: 30s
       retries: 10
       interval: 10s
