@@ -20,8 +20,6 @@ logger = logging.getLogger(name=__name__)
 
 
 def main():
-    print("Hello from data-pipeline!")
-
     for json_path in (
         JSON_PATH_BOOK24,
         JSON_PATH_CHITAI_GOROD,
