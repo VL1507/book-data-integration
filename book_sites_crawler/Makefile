@@ -8,9 +8,3 @@ format:
 lint:
 	uv run ruff check
 	uv run mypy .
-
-format_check:
-	uv run ruff check
-
-test:
-	uv run pytest

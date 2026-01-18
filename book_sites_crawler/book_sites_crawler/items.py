@@ -42,10 +42,6 @@ class BookSitesCrawlerItem(Item):
     # CoveragesTypes
     coverages_types_name = Field()
 
-    # AdditionalCharacteristics # TODO: что это и зачем
-    # additional_characteristics_name = Field()
-    # CharacteristicsToAdditional
-    # characteristics_to_additional_value = Field()
     additional_characteristics = Field()
 
     image_urls = Field()
