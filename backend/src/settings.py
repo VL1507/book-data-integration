@@ -10,7 +10,7 @@ class DB(BaseModel):
     NAME: str
 
     @computed_field
-    def URL(self) -> str:
+    def url(self) -> str:
         return f"mysql+aiomysql://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.NAME}"
 
 
@@ -29,4 +29,4 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()  # type: ignore
+settings = Settings()  # type: ignore  # noqa: PGH003

@@ -22,7 +22,7 @@ app.include_router(api_router)
 
 
 @app.get("/")
-async def root():
+async def root() -> RedirectResponse:
     return RedirectResponse(url="/docs")
 
 

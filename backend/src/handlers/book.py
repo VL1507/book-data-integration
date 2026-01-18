@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from dependency import get_book_service
+from schema.book import BookForListSchema, BookFull
 from service.book import BookService
 
 router = APIRouter(prefix="/books")
@@ -10,8 +11,7 @@ router = APIRouter(prefix="/books")
 async def get_book_by_publication_id(
     publication_id: int,
     book_service: BookService = Depends(get_book_service),
-):
-    print(publication_id)
+) -> BookFull:
     book = await book_service.get_book_by_publication_id(
         publication_id=publication_id
     )
@@ -35,7 +35,7 @@ async def get_books(
     limit: int = Query(10, description="Лимит результатов", ge=1, le=100),
     offset: int = Query(0, description="Смещение", ge=0),
     book_service: BookService = Depends(get_book_service),
-):
+) -> list[BookForListSchema]:
     books = await book_service.get_books(
         limit=limit,
         offset=offset,

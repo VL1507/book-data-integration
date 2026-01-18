@@ -1,4 +1,4 @@
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, select, RowMapping
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.models import (
@@ -23,7 +23,9 @@ class BookRepository:
     def __init__(self, db_session: AsyncSession):
         self.__db_session = db_session
 
-    async def get_book_by_publication_id(self, publication_id: int):
+    async def get_book_by_publication_id(
+        self, publication_id: int
+    ) -> list[RowMapping]:
         stmt = (
             select(
                 Publication.id.label("publication_id"),
