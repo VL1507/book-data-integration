@@ -1,4 +1,3 @@
-
 from sqlalchemy import bindparam, text
 from sqlalchemy.exc import OperationalError
 from tqdm import tqdm

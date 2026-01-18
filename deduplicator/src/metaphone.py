@@ -21,7 +21,7 @@ def process_phonetic(word):
     ).transform(word)
 
 
-def column_exists(session, table_name, column_name):
+def column_exists(session, table_name, column_name) -> bool:
     """Проверяет, существует ли колонка в таблице"""
     inspector = inspect(session.bind)
     columns = inspector.get_columns(table_name)

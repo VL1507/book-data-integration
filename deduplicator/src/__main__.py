@@ -11,7 +11,7 @@ from deduplicate import process_books_groups
 from metaphone import process_books_metaphone
 
 
-def get_engine(db_retry_attempts=5, db_retry_delay=10):
+def get_engine(db_retry_attempts: int = 5, db_retry_delay: float = 10):
     """Создает и возвращает движок базы данных. Включает в себя логику попыток"""
     connection_string = os.getenv("DATABASE_URL")
 
