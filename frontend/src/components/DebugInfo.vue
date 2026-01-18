@@ -65,7 +65,6 @@ const testConnection = async () => {
     }
   }
 
-  // Проверяем общий статус
   const hasErrors = connectionResults.value.some((result) => result.status === 'error')
   apiStatus.value = hasErrors ? 'offline' : 'online'
   apiStatusText.value = hasErrors ? 'Есть проблемы' : 'Всё работает'

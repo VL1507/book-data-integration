@@ -16,8 +16,6 @@
         <BookCard v-for="book in featuredBooks" :key="book.publication_id" :book="book" />
       </div>
     </div>
-
-    <!-- <BookModal v-if="selectedBook" :book="selectedBook" @close="selectedBook = null" /> -->
   </div>
 </template>
 

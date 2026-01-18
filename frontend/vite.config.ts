@@ -20,7 +20,7 @@ export default defineConfig({
   //     },
   //   },
   // },
-  base: '/', // важно оставить / (или /subpath/ если будет подкаталог)
+  base: '/',
   build: {
     outDir: 'dist',
   },

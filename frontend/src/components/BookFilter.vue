@@ -94,10 +94,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { BookFilters } from '@/types/book'
-// import CustomMinMaxSlider from './CustomMinMaxSlider.vue'
-
-// const sliderMin = ref(50)
-// const sliderMax = ref(80)
 
 interface Props {
   filters: BookFilters
@@ -122,10 +118,6 @@ const hasActiveFilters = computed(() => {
 })
 
 const applyFilters = () => {
-  // console.log(localFilters.value.year_from)
-  // console.log(localFilters.value.year_to)
-
-  // Очищаем пустые значения перед отправкой
   const cleanedFilters: BookFilters = {}
 
   Object.entries(localFilters.value).forEach(([key, value]) => {

@@ -18,7 +18,6 @@
         <span class="book-year">{{ formatYears }}</span>
         <span class="book-genre">{{ formatGenres }}</span>
       </div>
-      <!-- <p class="book-description">{{ truncatedDescription }}</p> -->
       <div class="book-link">
         <span class="link-text">Подробнее →</span>
       </div>

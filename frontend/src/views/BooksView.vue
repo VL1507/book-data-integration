@@ -30,20 +30,6 @@
     </div>
 
     <div v-else>
-      <!-- <div class="books-header">
-        <div class="books-stats">
-          Найдено книг: <strong>{{ books.length }}</strong>
-          <span v-if="hasMore" class="more-available">(есть еще)</span>
-        </div>
-        <div class="sort-controls" v-if="books.length > 0">
-          <label>Сортировка:</label>
-          <select v-model="sortBy" @change="applySorting" class="sort-select">
-            <option value="title">По названию</option>
-            <option value="year">По году</option>
-          </select>
-        </div>
-      </div> -->
-
       <div class="books-grid">
         <BookCard v-for="book in sortedBooks" :key="book.publication_id" :book="book" />
       </div>
@@ -127,7 +113,6 @@ const loadBooks = async (reset: boolean = false) => {
       books.value = [...books.value, ...newBooks]
     }
   } catch (err) {
-    // error.value = 'Ошибка при загрузке книг'
     console.error('Ошибка:', err)
   } finally {
     loading.value = false
@@ -141,9 +126,6 @@ const loadMore = async () => {
   appliedFilters.value.offset = books.value.length
   await loadBooks(false)
 }
-
-// const applySorting = () => {
-// }
 
 onMounted(async () => {
   await loadBooks(true)

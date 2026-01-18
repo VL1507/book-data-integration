@@ -8,7 +8,6 @@
     <div v-else-if="error" class="error">{{ error }}</div>
 
     <div v-else-if="book" class="book-content">
-      <!-- Основная информация о книге -->
       <div class="book-header">
         <div class="main-cover" v-if="mainCoverUrl">
           <img
@@ -40,7 +39,6 @@
 
           <div class="book-annotation" v-if="book.annotation">
             <h3>Аннотация</h3>
-            <!-- <p>{{ book.annotation }}</p> -->
             <p>{{ shortAnnotation }}</p>
           </div>
         </div>
@@ -112,7 +110,7 @@ const error = ref('')
 const imageLoaded = ref(false)
 const imageError = ref(false)
 
-const MAX_ANNOTATION_LENGTH = 1300 // подбери под дизайн
+const MAX_ANNOTATION_LENGTH = 1300
 const shortAnnotation = computed(() => {
   if (!book.value?.annotation) return ''
   const text = book.value.annotation.trim()
@@ -122,8 +120,6 @@ const shortAnnotation = computed(() => {
   if (dotIndex >= 0) {
     return text.slice(0, dotIndex + 1) + '…'
   }
-
-  // запасной вариант — просто по длине
   return text.slice(0, MAX_ANNOTATION_LENGTH).replace(/[.,!?;]$/, '') + '…'
 })
 
@@ -203,7 +199,6 @@ watch(
   text-decoration: underline;
 }
 
-/* ── Основной блок книги ── */
 .book-header {
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -272,7 +267,6 @@ watch(
   color: #1f2937;
 }
 
-/* ── Блок изданий ── */
 .editions-section {
   margin-top: 3rem;
 }
@@ -368,7 +362,6 @@ watch(
   font-size: 0.92rem;
 }
 
-/* кнопки */
 .action-buttons {
   margin-top: 2.5rem;
   display: flex;
@@ -402,7 +395,6 @@ watch(
   background: #4b5563;
 }
 
-/* адаптив */
 @media (max-width: 900px) {
   .book-header {
     grid-template-columns: 1fr;
