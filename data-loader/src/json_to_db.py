@@ -376,8 +376,6 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
 
             session.flush()
 
-            # AdditionalCharacteristics
-
             # Characteristics
 
             characteristics = Characteristics(
@@ -400,10 +398,6 @@ def dump_to_sql(book_items: list[BookSitesCrawlerItem]) -> None:
             session.flush()
 
             # Genre
-
-            # if len(book_item.genre) == 0:
-            #     logger.debug("continue - len(book_item.genre) == 0")
-            #     continue
 
             for book_genre in book_item.genre:
                 genre_key = book_genre
