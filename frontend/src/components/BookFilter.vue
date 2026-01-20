@@ -127,14 +127,14 @@ const applyFilters = () => {
   })
 
   cleanedFilters.offset = 0
-  cleanedFilters.limit = props.filters.limit || 10
+  cleanedFilters.limit = props.filters.limit || 9
 
   emit('update:filters', cleanedFilters)
   emit('apply')
 }
 
 const resetFilters = () => {
-  localFilters.value = { limit: 10, offset: 0 }
+  localFilters.value = { limit: 9, offset: 0 }
   emit('reset')
 }
 

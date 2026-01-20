@@ -35,7 +35,7 @@ const loadFeaturedBooks = async () => {
   error.value = ''
 
   try {
-    featuredBooks.value = await bookApi.getBooks({ limit: 4 })
+    featuredBooks.value = await bookApi.getBooks({ limit: 3 })
   } catch (err) {
     console.error('Ошибка при загрузке книг:', err)
     error.value = 'Не удалось загрузить книги. Проверьте подключение к бэкенду.'
